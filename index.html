@@ -1,288 +1,124 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>weLovePDF | PDFオンラインツール</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --red: #e2413e;
-      --red-dark: #c0302d;
-      --gray-light: #f5f5f5;
-      --gray: #888;
-      --text: #333;
-      --white: #fff;
-      --shadow: 0 2px 12px rgba(0,0,0,0.08);
-    }
-
-    body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      color: var(--text);
-      background: var(--white);
-    }
-
-    /* ===== NAV ===== */
-    header {
-      background: var(--white);
-      border-bottom: 1px solid #eee;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    nav {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 24px;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      gap: 32px;
-    }
-    .logo {
-      font-size: 1.4rem;
-      font-weight: 800;
-      color: var(--red);
-      text-decoration: none;
-      letter-spacing: -0.5px;
-    }
-    .logo span { color: var(--text); }
-    .nav-links {
-      display: flex;
-      gap: 24px;
-      list-style: none;
-      flex: 1;
-    }
-    .nav-links a {
-      text-decoration: none;
-      color: var(--text);
-      font-size: 0.92rem;
-      font-weight: 500;
-    }
-    .nav-links a:hover { color: var(--red); }
-    .nav-right { display: flex; gap: 12px; margin-left: auto; }
-    .btn-outline {
-      padding: 7px 18px;
-      border: 1.5px solid var(--red);
-      color: var(--red);
-      border-radius: 6px;
-      font-size: 0.88rem;
-      font-weight: 600;
-      cursor: pointer;
-      background: transparent;
-      text-decoration: none;
-    }
-    .btn-outline:hover { background: #fff0f0; }
-    .btn-solid {
-      padding: 7px 18px;
-      background: var(--red);
-      color: var(--white);
-      border: none;
-      border-radius: 6px;
-      font-size: 0.88rem;
-      font-weight: 600;
-      cursor: pointer;
-      text-decoration: none;
-    }
-    .btn-solid:hover { background: var(--red-dark); }
-
-    /* ===== HERO ===== */
-    .hero {
-      background: linear-gradient(135deg, #fff 0%, #fff5f5 100%);
-      text-align: center;
-      padding: 64px 24px 48px;
-    }
-    .hero h1 {
-      font-size: 2.4rem;
-      font-weight: 800;
-      color: var(--text);
-      margin-bottom: 16px;
-      line-height: 1.2;
-    }
-    .hero h1 span { color: var(--red); }
-    .hero p {
-      font-size: 1.05rem;
-      color: #555;
-      max-width: 640px;
-      margin: 0 auto 32px;
-      line-height: 1.7;
-    }
-
-    /* ===== FILTER TABS ===== */
-    .filter-bar {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 24px 24px;
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .filter-btn {
-      padding: 7px 16px;
-      border: 1.5px solid #ddd;
-      border-radius: 20px;
-      background: var(--white);
-      color: var(--gray);
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .filter-btn.active, .filter-btn:hover {
-      border-color: var(--red);
-      color: var(--red);
-      background: #fff0f0;
-    }
-
-    /* ===== TOOL GRID ===== */
-    .tools-section {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 24px 64px;
-    }
-    .tools-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 20px;
-    }
-    .tool-card {
-      background: var(--white);
-      border: 1.5px solid #eee;
-      border-radius: 12px;
-      padding: 28px 20px 24px;
-      text-decoration: none;
-      color: var(--text);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: 12px;
-      transition: all 0.18s;
-      box-shadow: var(--shadow);
-    }
-    .tool-card:hover {
-      border-color: var(--red);
-      transform: translateY(-3px);
-      box-shadow: 0 8px 24px rgba(226,65,62,0.12);
-    }
-    .tool-icon {
-      width: 56px;
-      height: 56px;
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.6rem;
-    }
-    .tool-card h3 {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: var(--text);
-    }
-    .tool-card p {
-      font-size: 0.82rem;
-      color: var(--gray);
-      line-height: 1.5;
-    }
-    .badge {
-      font-size: 0.7rem;
-      background: var(--red);
-      color: white;
-      padding: 2px 8px;
-      border-radius: 20px;
-      font-weight: 600;
-    }
-
-    /* ===== FEATURES ===== */
-    .features {
-      background: var(--gray-light);
-      padding: 64px 24px;
-      text-align: center;
-    }
-    .features h2 {
-      font-size: 1.8rem;
-      font-weight: 800;
-      margin-bottom: 12px;
-    }
-    .features > p {
-      color: #666;
-      margin-bottom: 48px;
-    }
-    .features-grid {
-      max-width: 1000px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 32px;
-    }
-    .feature-item { display: flex; flex-direction: column; align-items: center; gap: 12px; }
-    .feature-item .icon { font-size: 2.4rem; }
-    .feature-item h3 { font-size: 1rem; font-weight: 700; }
-    .feature-item p { font-size: 0.88rem; color: #666; line-height: 1.6; }
-
-    /* ===== FOOTER ===== */
-    footer {
-      background: #2d2d2d;
-      color: #ccc;
-      padding: 48px 24px 32px;
-    }
-    .footer-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    .footer-top {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 32px;
-      margin-bottom: 40px;
-    }
-    .footer-col h4 {
-      color: var(--white);
-      font-size: 0.9rem;
-      margin-bottom: 16px;
-      font-weight: 700;
-    }
-    .footer-col a {
-      display: block;
-      color: #aaa;
-      text-decoration: none;
-      font-size: 0.85rem;
-      margin-bottom: 8px;
-    }
-    .footer-col a:hover { color: var(--white); }
-    .footer-bottom {
-      border-top: 1px solid #444;
-      padding-top: 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .footer-logo {
-      font-size: 1.2rem;
-      font-weight: 800;
-      color: var(--white);
-    }
-    .footer-logo span { color: var(--red); }
-    .footer-copy { font-size: 0.82rem; color: #777; }
-
-    @media (max-width: 600px) {
-      .hero h1 { font-size: 1.7rem; }
-      .nav-links { display: none; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>weLovePDF | PDFオンラインツール</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--red:#e2413e;--red-dark:#c0302d;--gray-light:#f5f5f5;--gray:#888;--text:#333;--white:#fff}
+body{font-family:'Segoe UI',Arial,sans-serif;color:var(--text);background:var(--white)}
+header{background:var(--white);border-bottom:1px solid #eee;position:sticky;top:0;z-index:300}
+nav{max-width:1200px;margin:0 auto;padding:0 24px;height:60px;display:flex;align-items:center;gap:4px}
+.logo{font-size:1.4rem;font-weight:800;color:var(--red);text-decoration:none;margin-right:20px}
+.logo span{color:var(--text)}
+.nav-links{display:flex;gap:2px;list-style:none;align-items:center}
+.nav-links>li>a{display:flex;align-items:center;gap:4px;text-decoration:none;color:var(--text);font-size:.88rem;font-weight:500;padding:8px 12px;border-radius:6px;white-space:nowrap}
+.nav-links>li>a:hover,.nav-links>li>a.active{background:#f5f5f5;color:var(--red)}
+.nav-dropdown{position:relative}
+.dropdown-menu{display:none;position:absolute;top:calc(100% + 6px);left:0;background:var(--white);border:1px solid #eee;border-radius:12px;padding:20px 24px;box-shadow:0 8px 32px rgba(0,0,0,.12);z-index:400;gap:32px;min-width:520px}
+.nav-dropdown:hover .dropdown-menu{display:flex}
+.dropdown-col{min-width:200px}
+.dropdown-col h5{font-size:.75rem;color:#aaa;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;font-weight:700}
+.dropdown-col a{display:block;color:var(--text);text-decoration:none;font-size:.86rem;padding:5px 6px;border-radius:6px}
+.dropdown-col a:hover{background:#fff5f5;color:var(--red)}
+.nav-right{display:flex;gap:12px;margin-left:auto}
+.btn-outline{padding:7px 18px;border:1.5px solid var(--red);color:var(--red);border-radius:6px;font-size:.88rem;font-weight:600;background:transparent;text-decoration:none}
+.btn-solid{padding:7px 18px;background:var(--red);color:var(--white);border:none;border-radius:6px;font-size:.88rem;font-weight:600;cursor:pointer;text-decoration:none}
+/* Hero */
+.hero{background:linear-gradient(135deg,#fff5f5 0%,#fff 60%);text-align:center;padding:80px 24px 64px}
+.hero h1{font-size:2.8rem;font-weight:900;margin-bottom:16px;line-height:1.2}
+.hero h1 span{color:var(--red)}
+.hero p{font-size:1.1rem;color:#555;max-width:600px;margin:0 auto 36px;line-height:1.7}
+.hero-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.hero-btn-primary{padding:14px 36px;background:var(--red);color:#fff;border-radius:10px;font-size:1rem;font-weight:700;text-decoration:none;border:none;cursor:pointer}
+.hero-btn-primary:hover{background:var(--red-dark)}
+.hero-btn-secondary{padding:14px 36px;border:2px solid var(--red);color:var(--red);border-radius:10px;font-size:1rem;font-weight:700;text-decoration:none;background:transparent}
+.hero-btn-secondary:hover{background:#fff5f5}
+/* Tools section */
+.tools-section{max-width:1200px;margin:0 auto;padding:64px 24px}
+.tools-section h2{font-size:1.6rem;font-weight:800;margin-bottom:28px;text-align:center}
+.filter-tabs{display:flex;gap:8px;margin-bottom:36px;flex-wrap:wrap;justify-content:center}
+.filter-tab{padding:8px 20px;border-radius:20px;border:1.5px solid #ddd;background:#fff;font-size:.88rem;font-weight:600;cursor:pointer;color:var(--gray);transition:all .2s}
+.filter-tab:hover,.filter-tab.active{background:var(--red);color:#fff;border-color:var(--red)}
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:20px}
+.tool-card{background:#fff;border:1.5px solid #eee;border-radius:14px;padding:24px 20px;text-decoration:none;color:var(--text);transition:all .2s;position:relative;display:block}
+.tool-card:hover{border-color:var(--red);box-shadow:0 4px 20px rgba(226,65,62,.12);transform:translateY(-2px)}
+.tool-card .tc-icon{font-size:2rem;margin-bottom:12px}
+.tool-card h3{font-size:.95rem;font-weight:700;margin-bottom:6px;line-height:1.3}
+.tool-card p{font-size:.8rem;color:var(--gray);line-height:1.5}
+.badge-soon{position:absolute;top:12px;right:12px;background:linear-gradient(135deg,var(--red),#ff6b35);color:#fff;font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:10px;letter-spacing:.5px}
+/* Why section */
+.why-section{background:var(--gray-light);padding:72px 24px;text-align:center}
+.why-section h2{font-size:1.6rem;font-weight:800;margin-bottom:48px}
+.why-grid{max-width:900px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:32px}
+.why-item{text-align:center}
+.wi-icon{font-size:2.2rem;margin-bottom:14px}
+.why-item h3{font-size:1rem;font-weight:700;margin-bottom:8px}
+.why-item p{font-size:.88rem;color:#555;line-height:1.6}
+/* Footer */
+footer{background:#2d2d2d;color:#ccc;padding:48px 24px 24px}
+.footer-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:2fr repeat(3,1fr);gap:40px;margin-bottom:40px}
+.footer-brand .logo{font-size:1.3rem;display:inline-block;margin-bottom:12px}
+.footer-brand p{font-size:.85rem;color:#999;line-height:1.6}
+.footer-col h4{font-size:.85rem;font-weight:700;color:#fff;margin-bottom:16px;text-transform:uppercase;letter-spacing:.5px}
+.footer-col a{display:block;color:#aaa;text-decoration:none;font-size:.83rem;padding:3px 0;transition:color .2s}
+.footer-col a:hover{color:var(--red)}
+.footer-bottom{border-top:1px solid #444;padding-top:20px;text-align:center;font-size:.82rem;color:#777}
+</style>
 </head>
 <body>
-
-<!-- HEADER -->
 <header>
   <nav>
     <a href="index.html" class="logo">we<span>Love</span>PDF</a>
     <ul class="nav-links">
-      <li><a href="merge.html">PDF結合</a></li>
-      <li><a href="split.html">PDF分割</a></li>
-      <li><a href="compress.html">PDF圧縮</a></li>
+      <li><a href="merge.html">PDF 結合</a></li>
+      <li><a href="split.html">PDF 分割</a></li>
+      <li><a href="compress.html">PDF 圧縮</a></li>
+      <li class="nav-dropdown">
+        <a href="#">PDF 変換 ▾</a>
+        <div class="dropdown-menu">
+          <div class="dropdown-col">
+            <h5>PDFに変換</h5>
+            <a href="jpg-to-pdf.html">🖼️ JPEG → PDF</a>
+            <a href="word-to-pdf.html">📝 WORD → PDF</a>
+            <a href="ppt-to-pdf.html">📊 POWERPOINT → PDF</a>
+            <a href="excel-to-pdf.html">📈 EXCEL → PDF</a>
+            <a href="html-to-pdf.html">🌐 HTML → PDF</a>
+          </div>
+          <div class="dropdown-col">
+            <h5>PDFから変換</h5>
+            <a href="pdf-to-jpg.html">📸 PDF → JPEG</a>
+            <a href="pdf-to-word.html">📝 PDF → WORD</a>
+            <a href="pdf-to-ppt.html">📊 PDF → POWERPOINT</a>
+            <a href="pdf-to-excel.html">📈 PDF → EXCEL</a>
+            <a href="pdf-to-pdfa.html">📄 PDF → PDF/A</a>
+          </div>
+        </div>
+      </li>
+      <li class="nav-dropdown">
+        <a href="#tools" class="active">すべてのPDFツール ▾</a>
+        <div class="dropdown-menu">
+          <div class="dropdown-col">
+            <h5>PDFを編成</h5>
+            <a href="merge.html">📄 PDF 結合</a>
+            <a href="split.html">✂️ PDF 分割</a>
+            <a href="organize.html">📋 PDFを編成</a>
+            <a href="delete-pages.html">🗑️ ページを削除</a>
+            <a href="rotate.html">🔃 PDFを回転</a>
+            <a href="crop.html">📐 PDFをトリミング</a>
+          </div>
+          <div class="dropdown-col">
+            <h5>PDFを編集・保護</h5>
+            <a href="watermark.html">💧 透かしを追加</a>
+            <a href="page-number.html">🔢 ページ番号を追加</a>
+            <a href="sign.html">✍️ PDFに署名</a>
+            <a href="protect.html">🔒 PDFを保護</a>
+            <a href="unlock.html">🔓 ロック解除</a>
+            <a href="redact.html">⬛ 墨消し</a>
+          </div>
+        </div>
+      </li>
     </ul>
     <div class="nav-right">
       <a href="#" class="btn-outline">ログイン</a>
@@ -291,219 +127,281 @@
   </nav>
 </header>
 
-<!-- HERO -->
 <section class="hero">
-  <h1>PDFをもっと<span>かんたん</span>に。</h1>
+  <h1>PDFを<span>もっとかんたん</span>に。</h1>
   <p>完全無料のオンラインPDFツール。結合・分割・圧縮など、あらゆるPDF操作をブラウザだけで完結。インストール不要。</p>
-</section>
-
-<!-- FILTER -->
-<div class="filter-bar">
-  <button class="filter-btn active" onclick="filterTools('all', this)">すべて</button>
-  <button class="filter-btn" onclick="filterTools('organize', this)">PDFを編成</button>
-  <button class="filter-btn" onclick="filterTools('optimize', this)">PDFを最適化</button>
-  <button class="filter-btn" onclick="filterTools('convert', this)">PDF変換</button>
-  <button class="filter-btn" onclick="filterTools('edit', this)">PDFを編集</button>
-  <button class="filter-btn" onclick="filterTools('security', this)">セキュリティ</button>
-</div>
-
-<!-- TOOLS GRID -->
-<section class="tools-section">
-  <div class="tools-grid" id="toolsGrid">
-
-    <a href="merge.html" class="tool-card" data-cat="organize">
-      <div class="tool-icon" style="background:#fff0f0;">📄</div>
-      <h3>PDF 結合</h3>
-      <p>複数のPDFを一つのファイルにまとめます。ページ順も自由に変更可能。</p>
-    </a>
-
-    <a href="split.html" class="tool-card" data-cat="organize">
-      <div class="tool-icon" style="background:#fff0f0;">✂️</div>
-      <h3>PDF 分割</h3>
-      <p>PDFを指定したページで分割。1ページごとの独立ファイルにもできます。</p>
-    </a>
-
-    <a href="compress.html" class="tool-card" data-cat="optimize">
-      <div class="tool-icon" style="background:#f0fff4;">🗜️</div>
-      <h3>PDF 圧縮</h3>
-      <p>ファイルサイズを削減しながら品質をできる限り維持します。</p>
-    </a>
-
-    <a href="#" class="tool-card" data-cat="convert">
-      <div class="tool-icon" style="background:#f0f4ff;">🔄</div>
-      <h3>PDFからWord</h3>
-      <p>PDFをDOC/DOCXに変換。テキストやレイアウトをそのまま保持。</p>
-    </a>
-
-    <a href="#" class="tool-card" data-cat="convert">
-      <div class="tool-icon" style="background:#fff8f0;">📊</div>
-      <h3>PDFからExcel</h3>
-      <p>PDFのデータをExcelスプレッドシートに直接変換。</p>
-    </a>
-
-    <a href="#" class="tool-card" data-cat="convert">
-      <div class="tool-icon" style="background:#f5f0ff;">📑</div>
-      <h3>PDFからPowerPoint</h3>
-      <p>PDFをPPT/PPTXスライドに変換して編集しやすくします。</p>
-    </a>
-
-    <a href="#" class="tool-card" data-cat="convert">
-      <div class="tool-icon" style="background:#f0f8ff;">🖼️</div>
-      <h3>PDF→JPEG変換</h3>
-      <p>PDFの各ページをJPG画像に変換、または画像を一括抽出。</p>
-    </a>
-
-    <a href="#" class="tool-card" data-cat="convert">
-      <div class="tool-icon" style="background:#fff0f8;">📸</div>
-      <h3>JPEG→PDF変換</h3>
-      <p>JPG画像を数秒でPDFに変換。向きや余白も調整できます。</p>
-    </a>
-
-    <a href="#" class="tool-card" data-cat="convert">
-      <div class="tool-icon" style="background:#f0fff8;">📝</div>
-      <h3>WordからPDF</h3>
-      <p>DOC/DOCXをフォーマットを保ったままPDFに変換。</p>
-    </a>
-
-    <a href="#" class="tool-card" data-cat="edit">
-      <div class="tool-icon" style="background:#fffbf0;">✏️</div>
-      <h3>PDFを編集</h3>
-      <p>テキスト・画像・図形を追加。フォント・色・サイズも変更できます。</p>
-    </a>
-
-    <a href="#" class="tool-card" data-cat="edit">
-      <div class="tool-icon" style="background:#f0f8ff;">🔢</div>
-      <h3>ページ番号を追加</h3>
-      <p>PDF文書にページ番号を挿入。位置・フォント・サイズを選択。</p>
-    </a>
-
-    <a href="#" class="tool-card" data-cat="edit">
-      <div class="tool-icon" style="background:#fff5f0;">💧</div>
-      <h3>透かしを追加</h3>
-      <p>テキストや画像の透かしをPDFに挿入。位置・透明度を設定。</p>
-    </a>
-
-    <a href="#" class="tool-card" data-cat="edit">
-      <div class="tool-icon" style="background:#f5fff0;">🔃</div>
-      <h3>PDFを回転</h3>
-      <p>PDFページを90°/180°/270°回転。複数ページ一括対応。</p>
-    </a>
-
-    <a href="#" class="tool-card" data-cat="organize">
-      <div class="tool-icon" style="background:#fff0f5;">📋</div>
-      <h3>ページを削除</h3>
-      <p>不要なページをPDFから削除して、すっきり整理。</p>
-    </a>
-
-    <a href="#" class="tool-card" data-cat="security">
-      <div class="tool-icon" style="background:#fffaf0;">🔒</div>
-      <h3>PDFを保護</h3>
-      <p>パスワードでPDFを暗号化し、不正アクセスを防ぎます。</p>
-    </a>
-
-    <a href="#" class="tool-card" data-cat="security">
-      <div class="tool-icon" style="background:#f0fff5;">🔓</div>
-      <h3>PDF ロック解除</h3>
-      <p>PDFのパスワードを解除してどこでも自由に使えるように。</p>
-    </a>
-
-    <a href="#" class="tool-card" data-cat="security">
-      <div class="tool-icon" style="background:#fff0fb;">✍️</div>
-      <h3>PDFに署名</h3>
-      <p>電子署名を追加、または他者への署名依頼ができます。</p>
-    </a>
-
-    <a href="#" class="tool-card" data-cat="optimize">
-      <div class="tool-icon" style="background:#f8f0ff;">🔍</div>
-      <h3>OCR PDF</h3>
-      <p>スキャンしたPDFをテキスト検索・選択できる文書に変換。</p>
-      <span class="badge">近日公開</span>
-    </a>
-
+  <div class="hero-btns">
+    <a href="merge.html" class="hero-btn-primary">PDF 結合を試す</a>
+    <a href="#tools" class="hero-btn-secondary">すべてのツールを見る</a>
   </div>
 </section>
 
-<!-- FEATURES -->
-<section class="features">
+<section class="tools-section" id="tools">
+  <h2>すべてのPDFツール</h2>
+  <div class="filter-tabs">
+    <button class="filter-tab active" onclick="filterTools('all',this)">すべて</button>
+    <button class="filter-tab" onclick="filterTools('organize',this)">PDFを編成</button>
+    <button class="filter-tab" onclick="filterTools('optimize',this)">PDFを最適化</button>
+    <button class="filter-tab" onclick="filterTools('convert',this)">PDF変換</button>
+    <button class="filter-tab" onclick="filterTools('edit',this)">PDFを編集</button>
+    <button class="filter-tab" onclick="filterTools('security',this)">セキュリティ</button>
+    <button class="filter-tab" onclick="filterTools('ai',this)">AI機能</button>
+  </div>
+  <div class="tools-grid" id="toolsGrid">
+    <!-- PDFを編成 -->
+    <a href="merge.html" class="tool-card" data-cat="organize">
+      <div class="tc-icon">📄</div>
+      <h3>PDF 結合</h3>
+      <p>複数のPDFを一つにまとめます。ページ順も自由に変更。</p>
+    </a>
+    <a href="split.html" class="tool-card" data-cat="organize">
+      <div class="tc-icon">✂️</div>
+      <h3>PDF 分割</h3>
+      <p>PDFを指定したページで分割。1ページごとにも分割可能。</p>
+    </a>
+    <a href="organize.html" class="tool-card" data-cat="organize">
+      <div class="tc-icon">📋</div>
+      <h3>PDFを編成</h3>
+      <p>ページをドラッグ＆ドロップで並び替え。</p>
+    </a>
+    <a href="delete-pages.html" class="tool-card" data-cat="organize">
+      <div class="tc-icon">🗑️</div>
+      <h3>ページを削除</h3>
+      <p>不要なページをPDFから削除して整理。</p>
+    </a>
+    <a href="rotate.html" class="tool-card" data-cat="organize">
+      <div class="tc-icon">🔃</div>
+      <h3>PDFを回転</h3>
+      <p>PDFページを90°/180°/270°回転。複数ページ一括対応。</p>
+    </a>
+    <!-- PDFを最適化 -->
+    <a href="compress.html" class="tool-card" data-cat="optimize">
+      <div class="tc-icon">🗜️</div>
+      <h3>PDF 圧縮</h3>
+      <p>ファイルサイズを削減しながら品質を維持。</p>
+    </a>
+    <a href="repair.html" class="tool-card" data-cat="optimize">
+      <div class="tc-icon">🔧</div>
+      <h3>PDF修復</h3>
+      <p>破損したPDFファイルの修復を試みます。</p>
+    </a>
+    <a href="pdf-to-pdfa.html" class="tool-card" data-cat="optimize">
+      <div class="tc-icon">📁</div>
+      <h3>PDFからPDF/A</h3>
+      <p>長期保存に適したPDF/A形式に変換。</p>
+    </a>
+    <!-- PDF変換 -->
+    <a href="jpg-to-pdf.html" class="tool-card" data-cat="convert">
+      <div class="tc-icon">🖼️</div>
+      <h3>JPEG → PDF</h3>
+      <p>JPG/PNG画像をPDFに変換。複数画像をまとめることも。</p>
+    </a>
+    <a href="pdf-to-jpg.html" class="tool-card" data-cat="convert">
+      <div class="tc-icon">📸</div>
+      <h3>PDF → JPEG</h3>
+      <p>PDFの各ページをJPEG画像に変換。ZIPでダウンロード。</p>
+    </a>
+    <a href="word-to-pdf.html" class="tool-card" data-cat="convert">
+      <div class="tc-icon">📝</div>
+      <h3>WORD → PDF</h3>
+      <p>DOCXをフォーマット保持のままPDFに変換。</p>
+    </a>
+    <a href="pdf-to-word.html" class="tool-card" data-cat="convert">
+      <div class="tc-icon">📄</div>
+      <h3>PDF → WORD</h3>
+      <p>PDFをWord文書に変換して編集可能に。</p>
+      <span class="badge-soon">近日公開</span>
+    </a>
+    <a href="pdf-to-excel.html" class="tool-card" data-cat="convert">
+      <div class="tc-icon">📈</div>
+      <h3>PDF → EXCEL</h3>
+      <p>PDFの表データをExcelに変換。</p>
+      <span class="badge-soon">近日公開</span>
+    </a>
+    <a href="pdf-to-ppt.html" class="tool-card" data-cat="convert">
+      <div class="tc-icon">📊</div>
+      <h3>PDF → POWERPOINT</h3>
+      <p>PDFをPowerPointスライドに変換。</p>
+      <span class="badge-soon">近日公開</span>
+    </a>
+    <a href="excel-to-pdf.html" class="tool-card" data-cat="convert">
+      <div class="tc-icon">📈</div>
+      <h3>EXCEL → PDF</h3>
+      <p>Excelスプレッドシートを高品質PDFに変換。</p>
+      <span class="badge-soon">近日公開</span>
+    </a>
+    <a href="ppt-to-pdf.html" class="tool-card" data-cat="convert">
+      <div class="tc-icon">📊</div>
+      <h3>POWERPOINT → PDF</h3>
+      <p>PowerPointプレゼンをPDFに変換。</p>
+      <span class="badge-soon">近日公開</span>
+    </a>
+    <a href="html-to-pdf.html" class="tool-card" data-cat="convert">
+      <div class="tc-icon">🌐</div>
+      <h3>HTML → PDF</h3>
+      <p>WebページをPDFとして保存。</p>
+    </a>
+    <!-- PDFを編集 -->
+    <a href="watermark.html" class="tool-card" data-cat="edit">
+      <div class="tc-icon">💧</div>
+      <h3>透かしを追加</h3>
+      <p>テキストの透かしをPDFの全ページに追加。</p>
+    </a>
+    <a href="page-number.html" class="tool-card" data-cat="edit">
+      <div class="tc-icon">🔢</div>
+      <h3>ページ番号を追加</h3>
+      <p>PDFの各ページに自動でページ番号を追加。</p>
+    </a>
+    <a href="crop.html" class="tool-card" data-cat="edit">
+      <div class="tc-icon">📐</div>
+      <h3>PDFをトリミング</h3>
+      <p>PDFページの余白をトリミング。</p>
+    </a>
+    <a href="redact.html" class="tool-card" data-cat="edit">
+      <div class="tc-icon">⬛</div>
+      <h3>PDFを墨消し</h3>
+      <p>機密情報を黒塗りで永久に削除。</p>
+    </a>
+    <a href="edit.html" class="tool-card" data-cat="edit">
+      <div class="tc-icon">✏️</div>
+      <h3>PDFを編集</h3>
+      <p>テキスト・画像を直接編集。</p>
+      <span class="badge-soon">近日公開</span>
+    </a>
+    <a href="compare.html" class="tool-card" data-cat="edit">
+      <div class="tc-icon">🔍</div>
+      <h3>PDFを比較</h3>
+      <p>2つのPDFの差異を視覚的に検出。</p>
+      <span class="badge-soon">近日公開</span>
+    </a>
+    <a href="forms.html" class="tool-card" data-cat="edit">
+      <div class="tc-icon">📋</div>
+      <h3>PDFフォーム</h3>
+      <p>インタラクティブなPDFフォームを作成・編集。</p>
+      <span class="badge-soon">近日公開</span>
+    </a>
+    <!-- セキュリティ -->
+    <a href="protect.html" class="tool-card" data-cat="security">
+      <div class="tc-icon">🔒</div>
+      <h3>PDFを保護</h3>
+      <p>パスワードでPDFを暗号化して保護。</p>
+      <span class="badge-soon">近日公開</span>
+    </a>
+    <a href="unlock.html" class="tool-card" data-cat="security">
+      <div class="tc-icon">🔓</div>
+      <h3>PDF ロック解除</h3>
+      <p>パスワード保護されたPDFを解除。</p>
+    </a>
+    <a href="sign.html" class="tool-card" data-cat="security">
+      <div class="tc-icon">✍️</div>
+      <h3>PDFに署名</h3>
+      <p>手書き電子署名をPDFに追加。</p>
+    </a>
+    <!-- AI機能 -->
+    <a href="ocr.html" class="tool-card" data-cat="ai">
+      <div class="tc-icon">🔎</div>
+      <h3>OCR PDF</h3>
+      <p>スキャンPDFを検索可能なテキストに変換。</p>
+      <span class="badge-soon">近日公開</span>
+    </a>
+    <a href="summarize.html" class="tool-card" data-cat="ai">
+      <div class="tc-icon">🤖</div>
+      <h3>PDFをAI要約</h3>
+      <p>AIが長い文書を自動要約。要点を素早く把握。</p>
+      <span class="badge-soon">近日公開</span>
+    </a>
+    <a href="translate.html" class="tool-card" data-cat="ai">
+      <div class="tc-icon">🌐</div>
+      <h3>PDFを翻訳</h3>
+      <p>レイアウトを保ちながら多言語翻訳。</p>
+      <span class="badge-soon">近日公開</span>
+    </a>
+    <a href="scan.html" class="tool-card" data-cat="ai">
+      <div class="tc-icon">📷</div>
+      <h3>PDFをスキャン</h3>
+      <p>カメラで書類をスキャンしてPDF化。</p>
+      <span class="badge-soon">近日公開</span>
+    </a>
+  </div>
+</section>
+
+<section class="why-section">
   <h2>なぜ weLovePDF？</h2>
-  <p>安全・高速・完全無料。あなたのPDF作業をもっとスマートに。</p>
-  <div class="features-grid">
-    <div class="feature-item">
-      <div class="icon">⚡</div>
+  <div class="why-grid">
+    <div class="why-item">
+      <div class="wi-icon">⚡</div>
       <h3>高速処理</h3>
       <p>クラウド処理で大容量PDFも素早く変換。待ち時間を最小限に。</p>
     </div>
-    <div class="feature-item">
-      <div class="icon">🔐</div>
+    <div class="why-item">
+      <div class="wi-icon">🔐</div>
       <h3>安全・プライバシー保護</h3>
       <p>アップロードしたファイルは処理後すぐに削除。SSL暗号化で通信を保護。</p>
     </div>
-    <div class="feature-item">
-      <div class="icon">🌐</div>
+    <div class="why-item">
+      <div class="wi-icon">🌐</div>
       <h3>インストール不要</h3>
       <p>ブラウザだけで完結。Windows・Mac・スマホどこでも使えます。</p>
     </div>
-    <div class="feature-item">
-      <div class="icon">💯</div>
+    <div class="why-item">
+      <div class="wi-icon">💯</div>
       <h3>完全無料</h3>
       <p>基本機能はすべて無料。登録なしですぐに使い始められます。</p>
     </div>
   </div>
 </section>
 
-<!-- FOOTER -->
 <footer>
   <div class="footer-inner">
-    <div class="footer-top">
-      <div class="footer-col">
-        <h4>PDFツール</h4>
-        <a href="merge.html">PDF 結合</a>
-        <a href="split.html">PDF 分割</a>
-        <a href="compress.html">PDF 圧縮</a>
-        <a href="#">PDF→Word</a>
-        <a href="#">Word→PDF</a>
-      </div>
-      <div class="footer-col">
-        <h4>PDF編集</h4>
-        <a href="#">PDFを編集</a>
-        <a href="#">透かしを追加</a>
-        <a href="#">ページ番号</a>
-        <a href="#">PDFを回転</a>
-      </div>
-      <div class="footer-col">
-        <h4>セキュリティ</h4>
-        <a href="#">PDFを保護</a>
-        <a href="#">ロック解除</a>
-        <a href="#">PDFに署名</a>
-      </div>
-      <div class="footer-col">
-        <h4>サポート</h4>
-        <a href="#">よくある質問</a>
-        <a href="#">お問い合わせ</a>
-        <a href="#">プライバシーポリシー</a>
-        <a href="#">利用規約</a>
-      </div>
+    <div class="footer-brand">
+      <a href="index.html" class="logo" style="color:var(--red)">we<span style="color:#fff">Love</span>PDF</a>
+      <p>完全無料のオンラインPDFツール。<br>あなたのPDF作業をもっとスマートに。</p>
     </div>
-    <div class="footer-bottom">
-      <div class="footer-logo">we<span>Love</span>PDF</div>
-      <div class="footer-copy">©2026 weLovePDF — 完全無料のオンラインPDFツール</div>
+    <div class="footer-col">
+      <h4>PDFツール</h4>
+      <a href="merge.html">PDF 結合</a>
+      <a href="split.html">PDF 分割</a>
+      <a href="compress.html">PDF 圧縮</a>
+      <a href="rotate.html">PDFを回転</a>
+      <a href="watermark.html">透かしを追加</a>
+      <a href="page-number.html">ページ番号</a>
     </div>
+    <div class="footer-col">
+      <h4>PDF変換</h4>
+      <a href="jpg-to-pdf.html">JPEG → PDF</a>
+      <a href="pdf-to-jpg.html">PDF → JPEG</a>
+      <a href="word-to-pdf.html">WORD → PDF</a>
+      <a href="pdf-to-word.html">PDF → WORD</a>
+      <a href="html-to-pdf.html">HTML → PDF</a>
+      <a href="pdf-to-pdfa.html">PDF → PDF/A</a>
+    </div>
+    <div class="footer-col">
+      <h4>セキュリティ</h4>
+      <a href="protect.html">PDFを保護</a>
+      <a href="unlock.html">ロック解除</a>
+      <a href="sign.html">PDFに署名</a>
+      <a href="redact.html">PDFを墨消し</a>
+      <a href="ocr.html">OCR PDF</a>
+      <a href="summarize.html">AI要約</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>©2026 weLovePDF — 完全無料のオンラインPDFツール</p>
   </div>
 </footer>
 
 <script>
-  function filterTools(cat, btn) {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.querySelectorAll('.tool-card').forEach(card => {
-      if (cat === 'all' || card.dataset.cat === cat) {
-        card.style.display = '';
-      } else {
-        card.style.display = 'none';
-      }
-    });
-  }
+function filterTools(cat, btn) {
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.tool-card').forEach(card => {
+    if (cat === 'all' || card.dataset.cat === cat) {
+      card.style.display = '';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
 </script>
-
 </body>
 </html>
