@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EXCEL PDF 変換 - weLovePDF</title>
+<title>EXCEL → PDF 変換 | weLovePDF</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--red:#e2413e;--red-dark:#c0302d;--gray-light:#f5f5f5;--gray:#888;--text:#333;--white:#fff}
@@ -14,7 +15,7 @@ nav{max-width:1200px;margin:0 auto;padding:0 24px;height:60px;display:flex;align
 .logo span{color:var(--text)}
 .nav-links{display:flex;gap:2px;list-style:none;align-items:center}
 .nav-links>li>a{display:flex;align-items:center;gap:4px;text-decoration:none;color:var(--text);font-size:.88rem;font-weight:500;padding:8px 12px;border-radius:6px;white-space:nowrap}
-.nav-links>li>a:hover{background:#f5f5f5;color:var(--red)}
+.nav-links>li>a:hover,.nav-links>li>a.active{background:#f5f5f5;color:var(--red)}
 .nav-dropdown{position:relative}
 .dropdown-menu{display:none;position:absolute;top:calc(100% + 6px);left:0;background:var(--white);border:1px solid #eee;border-radius:12px;padding:20px 24px;box-shadow:0 8px 32px rgba(0,0,0,.12);z-index:400;gap:32px;min-width:480px}
 .nav-dropdown:hover .dropdown-menu{display:flex}
@@ -29,23 +30,41 @@ nav{max-width:1200px;margin:0 auto;padding:0 24px;height:60px;display:flex;align
 .tool-hero .big-icon{font-size:3.5rem;margin-bottom:20px}
 .tool-hero h1{font-size:2rem;font-weight:800;margin-bottom:12px}
 .tool-hero p{color:#555;font-size:1rem;max-width:560px;margin:0 auto;line-height:1.7}
-.cs-section{max-width:600px;margin:64px auto;padding:0 24px 80px;text-align:center}
-.cs-badge{display:inline-block;background:linear-gradient(135deg,var(--red),#ff6b35);color:white;font-size:.8rem;font-weight:700;padding:6px 18px;border-radius:20px;letter-spacing:1px;text-transform:uppercase;margin-bottom:28px}
-.cs-section h2{font-size:1.6rem;font-weight:800;margin-bottom:16px}
-.cs-section>p{color:#555;font-size:1rem;line-height:1.7;margin-bottom:32px}
-.features-preview{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:40px;text-align:left}
-.feature-item{background:var(--gray-light);border-radius:12px;padding:20px}
-.feature-item .fi-icon{font-size:1.5rem;margin-bottom:8px}
-.feature-item h4{font-size:.9rem;font-weight:700;margin-bottom:4px}
-.feature-item p{font-size:.82rem;color:var(--gray);margin:0}
-.notify-form{display:flex;gap:12px;max-width:400px;margin:0 auto 16px}
-.notify-form input{flex:1;padding:12px 16px;border:1.5px solid #ddd;border-radius:8px;font-size:.9rem;outline:none}
-.notify-form input:focus{border-color:var(--red)}
-.notify-form button{padding:12px 24px;background:var(--red);color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer;white-space:nowrap}
-.notify-form button:hover{background:var(--red-dark)}
-.notify-note{font-size:.82rem;color:var(--gray)}
-.cs-back{display:inline-block;margin-top:32px;color:var(--red);text-decoration:none;font-weight:600;font-size:.9rem}
-.cs-back:hover{text-decoration:underline}
+.upload-section{max-width:900px;margin:48px auto;padding:0 24px 64px}
+.drop-zone{border:2.5px dashed #ddd;border-radius:16px;padding:56px 24px;text-align:center;cursor:pointer;background:var(--gray-light);transition:all .2s}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--red);background:#fff5f5}
+.drop-zone .dz-icon{font-size:3rem;margin-bottom:16px}
+.drop-zone h3{font-size:1.1rem;font-weight:700;margin-bottom:8px}
+.drop-zone p{color:var(--gray);font-size:.9rem}
+.dz-btn{display:inline-block;margin-top:20px;padding:12px 32px;background:var(--red);color:var(--white);border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;border:none}
+.options-panel{margin-top:32px;background:var(--white);border:1.5px solid #eee;border-radius:14px;padding:28px;display:none}
+.options-panel h3{font-size:1rem;font-weight:700;margin-bottom:20px}
+.pdf-info{display:flex;align-items:center;gap:14px;padding:14px;background:var(--gray-light);border-radius:10px;margin-bottom:24px}
+.pdf-info .pdi{font-size:1.8rem}
+.pdf-info h4{font-size:.95rem;font-weight:700}
+.pdf-info small{color:var(--gray);font-size:.85rem}
+.info-note{background:#fff8e1;border:1.5px solid #ffd54f;border-radius:10px;padding:14px 18px;font-size:.85rem;color:#795548;margin-bottom:20px;line-height:1.6}
+.page-options{display:flex;gap:24px;margin-bottom:20px;flex-wrap:wrap}
+.page-opt-group{display:flex;flex-direction:column;gap:8px}
+.page-opt-group label.group-label{font-size:.82rem;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.5px}
+.radio-row{display:flex;gap:12px}
+.radio-row label{display:flex;align-items:center;gap:6px;font-size:.9rem;cursor:pointer}
+.radio-row input[type=radio]{accent-color:var(--red);width:16px;height:16px}
+.sheet-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+.sheet-tab{padding:6px 16px;border:1.5px solid #ddd;border-radius:8px;background:var(--white);font-size:.85rem;font-weight:600;cursor:pointer;color:var(--text);transition:all .15s}
+.sheet-tab.active{border-color:var(--red);background:#fff5f5;color:var(--red)}
+.preview-area{border:1px solid #eee;border-radius:10px;overflow:auto;max-height:400px;margin-bottom:20px}
+.preview-area table{border-collapse:collapse;width:100%;font-size:.82rem}
+.preview-area th{background:#f0f0f0;font-weight:700;border:1px solid #ccc;padding:6px 10px;white-space:nowrap}
+.preview-area td{border:1px solid #ddd;padding:5px 10px;white-space:nowrap}
+.preview-area tr:nth-child(even) td{background:#f9f9f9}
+.status{margin-top:12px;font-size:.9rem;color:var(--gray);text-align:center;min-height:24px}
+.status.err{color:#dc3545}
+.actions{margin-top:24px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.action-btn{padding:14px 36px;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;border:none}
+.action-btn-primary{background:var(--red);color:var(--white)}
+.action-btn-primary:hover{background:var(--red-dark)}
+.action-btn-secondary{background:var(--gray-light);color:var(--text);border:1.5px solid #ddd}
 .how-section{background:var(--gray-light);padding:56px 24px;text-align:center}
 .how-section h2{font-size:1.5rem;font-weight:800;margin-bottom:40px}
 .how-steps{max-width:800px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
@@ -70,19 +89,19 @@ footer a{color:var(--red);text-decoration:none;font-weight:700}
         <div class="dropdown-menu">
           <div class="dropdown-col">
             <h5>PDFに変換</h5>
-            <a href="jpg-to-pdf.html">🖼️ JPEG PDF 変換</a>
-            <a href="word-to-pdf.html">📝 WORD PDF 変換</a>
-            <a href="ppt-to-pdf.html">📊 POWERPOINT PDF 変換</a>
-            <a href="excel-to-pdf.html">📈 EXCEL PDF 変換</a>
-            <a href="html-to-pdf.html">🌐 HTMLからPDF</a>
+            <a href="jpg-to-pdf.html">🖼️ JPEG → PDF</a>
+            <a href="word-to-pdf.html">📝 WORD → PDF</a>
+            <a href="ppt-to-pdf.html">📊 POWERPOINT → PDF</a>
+            <a href="excel-to-pdf.html" class="active">📈 EXCEL → PDF</a>
+            <a href="html-to-pdf.html">🌐 HTML → PDF</a>
           </div>
           <div class="dropdown-col">
             <h5>PDFから変換</h5>
-            <a href="pdf-to-jpg.html">📸 PDF JPEG 変換</a>
-            <a href="pdf-to-word.html">📝 PDF WORD 変換</a>
-            <a href="pdf-to-ppt.html">📊 PDF POWERPOINT 変換</a>
-            <a href="pdf-to-excel.html">📈 PDF EXCEL 変換</a>
-            <a href="pdf-to-pdfa.html">📄 PDFからPDF/A</a>
+            <a href="pdf-to-jpg.html">📸 PDF → JPEG</a>
+            <a href="pdf-to-word.html">📝 PDF → WORD</a>
+            <a href="pdf-to-ppt.html">📊 PDF → POWERPOINT</a>
+            <a href="pdf-to-excel.html">📈 PDF → EXCEL</a>
+            <a href="pdf-to-pdfa.html">📄 PDF → PDF/A</a>
           </div>
         </div>
       </li>
@@ -97,49 +116,277 @@ footer a{color:var(--red);text-decoration:none;font-weight:700}
 
 <section class="tool-hero">
   <div class="big-icon">📈</div>
-  <h1>EXCEL PDF 変換</h1>
-  <p>Excelスプレッドシートを高品質なPDFに変換します。表、グラフ、数式を正確に保持します。</p>
+  <h1>EXCEL → PDF 変換</h1>
+  <p>Excelファイルを読み込んで表を表示し、PDFとして保存できます。</p>
 </section>
 
-<div class="cs-section">
-  <div class="cs-badge">🚀 近日公開</div>
-  <h2>この機能は近日公開予定です</h2>
-  <p>現在開発中です。公開までしばらくお待ちください。メールアドレスを登録すると、公開時にお知らせします。</p>
-  <div class="features-preview">
-    <div class="feature-item"><div class="fi-icon">📊</div><h4>グラフと図表</h4><p>Excelのグラフを高品質PDFに変換</p></div>
-    <div class="feature-item"><div class="fi-icon">🖨️</div><h4>印刷設定保持</h4><p>ページ設定や余白を維持</p></div>
-    <div class="feature-item"><div class="fi-icon">📋</div><h4>全シート対応</h4><p>複数シートを1つのPDFに結合</p></div>
-    <div class="feature-item"><div class="fi-icon">🎨</div><h4>書式保持</h4><p>セルの色、フォント、枠線を保持</p></div>
+<div class="upload-section">
+  <div class="drop-zone" id="dropZone">
+    <div class="dz-icon">📊</div>
+    <h3>ExcelファイルをここにドロップEXCEL</h3>
+    <p>.xlsx / .xls / .csv に対応</p>
+    <button class="dz-btn" id="selectBtn">ファイルを選択</button>
+    <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" style="display:none">
   </div>
-  <form class="notify-form" onsubmit="subscribe(event)">
-    <input type="email" placeholder="メールアドレスを入力" required>
-    <button type="submit">通知を受け取る</button>
-  </form>
-  <p class="notify-note">公開時にお知らせします。迷惑メールは送信しません。</p>
-  <a href="index.html" class="cs-back">← すべてのPDFツールに戻る</a>
+
+  <div class="options-panel" id="optionsPanel">
+    <h3>📈 変換設定</h3>
+    <div class="pdf-info">
+      <span class="pdi">📊</span>
+      <div>
+        <h4 id="fileName">ファイル名</h4>
+        <small id="fileDetails">読み込み中...</small>
+      </div>
+    </div>
+    <div class="info-note">
+      ℹ️ ブラウザの印刷ダイアログを使用してPDFとして保存します。「送信先」で「PDFとして保存」を選択してください。書式・罫線・グラフは表示スタイルで再現されます。
+    </div>
+
+    <div class="page-options">
+      <div class="page-opt-group">
+        <label class="group-label">用紙サイズ</label>
+        <div class="radio-row">
+          <label><input type="radio" name="pageSize" value="A4" checked> A4</label>
+          <label><input type="radio" name="pageSize" value="letter"> Letter</label>
+        </div>
+      </div>
+      <div class="page-opt-group">
+        <label class="group-label">向き</label>
+        <div class="radio-row">
+          <label><input type="radio" name="orient" value="portrait" checked> 縦</label>
+          <label><input type="radio" name="orient" value="landscape"> 横</label>
+        </div>
+      </div>
+    </div>
+
+    <div id="sheetTabsContainer" style="display:none">
+      <label style="font-size:.82rem;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;display:block">シートを選択</label>
+      <div class="sheet-tabs" id="sheetTabs"></div>
+    </div>
+
+    <div class="preview-area" id="previewArea">
+      <div style="padding:20px;text-align:center;color:#aaa">プレビューを読み込んでいます...</div>
+    </div>
+
+    <div class="status" id="status"></div>
+
+    <div class="actions">
+      <button class="action-btn action-btn-primary" id="printBtn">🖨️ PDFとして保存</button>
+      <button class="action-btn action-btn-secondary" id="resetBtn">別のファイルを選択</button>
+    </div>
+  </div>
 </div>
 
 <section class="how-section">
-  <h2>使い方（公開後）</h2>
+  <h2>使い方</h2>
   <div class="how-steps">
-    <div class="how-step"><div class="sn">1</div><h3>Excelをアップロード</h3><p>.xlsx/.xlsファイルをドラッグ＆ドロップ</p></div>
-    <div class="how-step"><div class="sn">2</div><h3>変換設定を選択</h3><p>ページサイズや向きを選択</p></div>
-    <div class="how-step"><div class="sn">3</div><h3>PDFをダウンロード</h3><p>変換されたPDFをダウンロード</p></div>
+    <div class="how-step">
+      <div class="sn">1</div>
+      <h3>Excelをアップロード</h3>
+      <p>xlsx・xls・csvファイルをドロップまたは選択します</p>
+    </div>
+    <div class="how-step">
+      <div class="sn">2</div>
+      <h3>プレビューを確認</h3>
+      <p>表の内容を確認し、用紙サイズと向きを設定します</p>
+    </div>
+    <div class="how-step">
+      <div class="sn">3</div>
+      <h3>PDFとして保存</h3>
+      <p>印刷ダイアログで「PDFとして保存」を選択します</p>
+    </div>
   </div>
 </section>
 
 <footer>
-  <p>© 2024 weLovePDF. すべてのPDFツールを無料で使用できます。 | <a href="index.html">ホームへ戻る</a></p>
+  <p>© 2024 <a href="index.html">weLovePDF</a> — すべてのPDFツール</p>
 </footer>
 
 <script>
-function subscribe(e){
-  e.preventDefault();
-  const btn=e.target.querySelector('button');
-  btn.textContent='✓ 登録完了！';
-  btn.style.background='#28a745';
-  e.target.querySelector('input').disabled=true;
-  btn.disabled=true;
+let currentFile = null;
+let workbook = null;
+let sheetNames = [];
+let activeSheet = 0;
+let allSheetsData = [];
+
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const optionsPanel = document.getElementById('optionsPanel');
+
+document.getElementById('selectBtn').addEventListener('click', function(e) { e.stopPropagation(); fileInput.click(); });
+dropZone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', e => { if (e.target.files[0]) loadFile(e.target.files[0]); });
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('drag-over');
+  const f = e.dataTransfer.files[0];
+  if (f) loadFile(f);
+  else setStatus('ファイルを選択してください', true);
+});
+document.getElementById('printBtn').addEventListener('click', savePDF);
+document.getElementById('resetBtn').addEventListener('click', resetTool);
+
+async function loadFile(file) {
+  currentFile = file;
+  document.getElementById('fileName').textContent = file.name;
+  document.getElementById('fileDetails').textContent = '読み込み中...';
+  dropZone.style.display = 'none';
+  optionsPanel.style.display = 'block';
+  setStatus('ファイルを読み込んでいます...');
+
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    workbook = XLSX.read(arrayBuffer, { type: 'array' });
+    sheetNames = workbook.SheetNames;
+    activeSheet = 0;
+    allSheetsData = [];
+
+    for (const sn of sheetNames) {
+      const ws = workbook.Sheets[sn];
+      const aoa = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+      allSheetsData.push({ name: sn, data: aoa });
+    }
+
+    document.getElementById('fileDetails').textContent = sheetNames.length + ' シート・' + (file.size / 1024).toFixed(1) + ' KB';
+
+    // Build sheet tabs
+    const tabsContainer = document.getElementById('sheetTabsContainer');
+    const tabsEl = document.getElementById('sheetTabs');
+    tabsEl.innerHTML = '';
+    if (sheetNames.length > 1) {
+      tabsContainer.style.display = 'block';
+      sheetNames.forEach((name, idx) => {
+        const tab = document.createElement('button');
+        tab.className = 'sheet-tab' + (idx === 0 ? ' active' : '');
+        tab.textContent = name;
+        tab.addEventListener('click', () => { activeSheet = idx; renderPreview(); updateTabs(); });
+        tabsEl.appendChild(tab);
+      });
+    } else {
+      tabsContainer.style.display = 'none';
+    }
+
+    renderPreview();
+    setStatus('');
+  } catch(e) {
+    setStatus('ファイルの読み込みに失敗しました: ' + e.message, true);
+    console.error(e);
+  }
+}
+
+function updateTabs() {
+  document.querySelectorAll('.sheet-tab').forEach((tab, idx) => {
+    tab.className = 'sheet-tab' + (idx === activeSheet ? ' active' : '');
+  });
+}
+
+function renderPreview() {
+  const preview = document.getElementById('previewArea');
+  const { name, data } = allSheetsData[activeSheet];
+
+  if (!data || data.length === 0) {
+    preview.innerHTML = '<div style="padding:20px;text-align:center;color:#aaa">データがありません</div>';
+    return;
+  }
+
+  let html = '<table><thead><tr>';
+  // Use first row as header if it has content
+  const headerRow = data[0];
+  const startIdx = (headerRow && headerRow.some(c => c !== '')) ? 0 : 0;
+  
+  if (data.length > 0) {
+    const firstRow = data[0];
+    html += '<tr>';
+    firstRow.forEach(cell => { html += '<th>' + escapeHtml(String(cell)) + '</th>'; });
+    html += '</tr></thead><tbody>';
+    
+    for (let r = 1; r < data.length; r++) {
+      const row = data[r];
+      html += '<tr>';
+      for (let c = 0; c < firstRow.length; c++) {
+        html += '<td>' + escapeHtml(String(row[c] !== undefined ? row[c] : '')) + '</td>';
+      }
+      html += '</tr>';
+    }
+    html += '</tbody></table>';
+  }
+
+  preview.innerHTML = html;
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function savePDF() {
+  const pageSize = document.querySelector('input[name="pageSize"]:checked').value;
+  const orient = document.querySelector('input[name="orient"]:checked').value;
+
+  // Build HTML for all sheets
+  let tablesHTML = '';
+  for (const sheet of allSheetsData) {
+    if (allSheetsData.length > 1) {
+      tablesHTML += '<h2>' + escapeHtml(sheet.name) + '</h2>';
+    }
+    if (!sheet.data || sheet.data.length === 0) {
+      tablesHTML += '<p>(データなし)</p>';
+      continue;
+    }
+    tablesHTML += '<table><thead><tr>';
+    const firstRow = sheet.data[0];
+    firstRow.forEach(cell => { tablesHTML += '<th>' + escapeHtml(String(cell)) + '</th>'; });
+    tablesHTML += '</tr></thead><tbody>';
+    for (let r = 1; r < sheet.data.length; r++) {
+      const row = sheet.data[r];
+      tablesHTML += '<tr>';
+      for (let c = 0; c < firstRow.length; c++) {
+        tablesHTML += '<td>' + escapeHtml(String(row[c] !== undefined ? row[c] : '')) + '</td>';
+      }
+      tablesHTML += '</tr>';
+    }
+    tablesHTML += '</tbody></table>';
+  }
+
+  const printWin = window.open('', '_blank');
+  if (!printWin) { setStatus('ポップアップがブロックされました。ポップアップを許可してください。', true); return; }
+
+  const pageSizeCss = pageSize === 'A4' ? 'A4' : 'letter';
+  const orientCss = orient === 'landscape' ? ' landscape' : '';
+
+  printWin.document.write(`<!DOCTYPE html><html><head>
+    <meta charset="UTF-8">
+    <title>${escapeHtml(currentFile ? currentFile.name : 'Excel')}</title>
+    <style>
+      @page { size: ${pageSizeCss}${orientCss}; margin: 10mm; }
+      body { font-family: Arial, sans-serif; font-size: 10px; color: #333; }
+      table { border-collapse: collapse; width: 100%; margin-bottom: 20px; page-break-inside: auto; }
+      thead { display: table-header-group; }
+      tr { page-break-inside: avoid; }
+      th { background: #f0f0f0; font-weight: bold; border: 1px solid #999; padding: 4px 8px; text-align: left; }
+      td { border: 1px solid #ddd; padding: 4px 8px; }
+      tr:nth-child(even) td { background: #f9f9f9; }
+      h2 { font-size: 13px; margin: 16px 0 6px; color: #333; border-bottom: 2px solid #e2413e; padding-bottom: 4px; }
+    </style>
+  </head><body>${tablesHTML}</body></html>`);
+  printWin.document.close();
+  printWin.onload = () => { setTimeout(() => printWin.print(), 200); };
+}
+
+function setStatus(msg, isErr) {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = 'status' + (isErr ? ' err' : '');
+}
+
+function resetTool() {
+  currentFile = null; workbook = null; sheetNames = []; allSheetsData = []; activeSheet = 0;
+  fileInput.value = '';
+  dropZone.style.display = 'block';
+  optionsPanel.style.display = 'none';
+  document.getElementById('previewArea').innerHTML = '<div style="padding:20px;text-align:center;color:#aaa">プレビューを読み込んでいます...</div>';
+  document.getElementById('sheetTabsContainer').style.display = 'none';
+  setStatus('');
 }
 </script>
 </body>

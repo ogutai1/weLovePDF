@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>POWERPOINT PDF 変換 - weLovePDF</title>
+<title>POWERPOINT → PDF 変換 | weLovePDF</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--red:#e2413e;--red-dark:#c0302d;--gray-light:#f5f5f5;--gray:#888;--text:#333;--white:#fff}
@@ -14,7 +15,7 @@ nav{max-width:1200px;margin:0 auto;padding:0 24px;height:60px;display:flex;align
 .logo span{color:var(--text)}
 .nav-links{display:flex;gap:2px;list-style:none;align-items:center}
 .nav-links>li>a{display:flex;align-items:center;gap:4px;text-decoration:none;color:var(--text);font-size:.88rem;font-weight:500;padding:8px 12px;border-radius:6px;white-space:nowrap}
-.nav-links>li>a:hover{background:#f5f5f5;color:var(--red)}
+.nav-links>li>a:hover,.nav-links>li>a.active{background:#f5f5f5;color:var(--red)}
 .nav-dropdown{position:relative}
 .dropdown-menu{display:none;position:absolute;top:calc(100% + 6px);left:0;background:var(--white);border:1px solid #eee;border-radius:12px;padding:20px 24px;box-shadow:0 8px 32px rgba(0,0,0,.12);z-index:400;gap:32px;min-width:480px}
 .nav-dropdown:hover .dropdown-menu{display:flex}
@@ -29,23 +30,37 @@ nav{max-width:1200px;margin:0 auto;padding:0 24px;height:60px;display:flex;align
 .tool-hero .big-icon{font-size:3.5rem;margin-bottom:20px}
 .tool-hero h1{font-size:2rem;font-weight:800;margin-bottom:12px}
 .tool-hero p{color:#555;font-size:1rem;max-width:560px;margin:0 auto;line-height:1.7}
-.cs-section{max-width:600px;margin:64px auto;padding:0 24px 80px;text-align:center}
-.cs-badge{display:inline-block;background:linear-gradient(135deg,var(--red),#ff6b35);color:white;font-size:.8rem;font-weight:700;padding:6px 18px;border-radius:20px;letter-spacing:1px;text-transform:uppercase;margin-bottom:28px}
-.cs-section h2{font-size:1.6rem;font-weight:800;margin-bottom:16px}
-.cs-section>p{color:#555;font-size:1rem;line-height:1.7;margin-bottom:32px}
-.features-preview{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:40px;text-align:left}
-.feature-item{background:var(--gray-light);border-radius:12px;padding:20px}
-.feature-item .fi-icon{font-size:1.5rem;margin-bottom:8px}
-.feature-item h4{font-size:.9rem;font-weight:700;margin-bottom:4px}
-.feature-item p{font-size:.82rem;color:var(--gray);margin:0}
-.notify-form{display:flex;gap:12px;max-width:400px;margin:0 auto 16px}
-.notify-form input{flex:1;padding:12px 16px;border:1.5px solid #ddd;border-radius:8px;font-size:.9rem;outline:none}
-.notify-form input:focus{border-color:var(--red)}
-.notify-form button{padding:12px 24px;background:var(--red);color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer;white-space:nowrap}
-.notify-form button:hover{background:var(--red-dark)}
-.notify-note{font-size:.82rem;color:var(--gray)}
-.cs-back{display:inline-block;margin-top:32px;color:var(--red);text-decoration:none;font-weight:600;font-size:.9rem}
-.cs-back:hover{text-decoration:underline}
+.upload-section{max-width:900px;margin:48px auto;padding:0 24px 64px}
+.drop-zone{border:2.5px dashed #ddd;border-radius:16px;padding:56px 24px;text-align:center;cursor:pointer;background:var(--gray-light);transition:all .2s}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--red);background:#fff5f5}
+.drop-zone .dz-icon{font-size:3rem;margin-bottom:16px}
+.drop-zone h3{font-size:1.1rem;font-weight:700;margin-bottom:8px}
+.drop-zone p{color:var(--gray);font-size:.9rem}
+.dz-btn{display:inline-block;margin-top:20px;padding:12px 32px;background:var(--red);color:var(--white);border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;border:none}
+.options-panel{margin-top:32px;background:var(--white);border:1.5px solid #eee;border-radius:14px;padding:28px;display:none}
+.options-panel h3{font-size:1rem;font-weight:700;margin-bottom:20px}
+.pdf-info{display:flex;align-items:center;gap:14px;padding:14px;background:var(--gray-light);border-radius:10px;margin-bottom:24px}
+.pdf-info .pdi{font-size:1.8rem}
+.pdf-info h4{font-size:.95rem;font-weight:700}
+.pdf-info small{color:var(--gray);font-size:.85rem}
+.info-note{background:#fff8e1;border:1.5px solid #ffd54f;border-radius:10px;padding:14px 18px;font-size:.85rem;color:#795548;margin-bottom:20px;line-height:1.6}
+.slide-preview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-bottom:24px;max-height:500px;overflow-y:auto;padding:4px}
+.slide-card{border:1.5px solid #eee;border-radius:10px;background:var(--white);overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.slide-card-header{background:linear-gradient(135deg,#667eea,#764ba2);padding:12px 14px;display:flex;align-items:center;justify-content:space-between}
+.slide-num{color:#fff;font-size:.75rem;font-weight:700;opacity:.8}
+.slide-card-body{padding:14px;min-height:100px}
+.slide-title{font-size:.9rem;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.3}
+.slide-texts{font-size:.78rem;color:#666;line-height:1.5}
+.slide-texts p{margin-bottom:2px}
+.status{margin-top:12px;font-size:.9rem;color:var(--gray);text-align:center;min-height:24px}
+.status.err{color:#dc3545}
+.actions{margin-top:8px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.action-btn{padding:14px 36px;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;border:none}
+.action-btn-primary{background:var(--red);color:var(--white)}
+.action-btn-primary:hover{background:var(--red-dark)}
+.action-btn-secondary{background:var(--gray-light);color:var(--text);border:1.5px solid #ddd}
+.prog-wrap{margin-top:20px;background:#eee;border-radius:8px;overflow:hidden;display:none}
+.prog-bar{height:6px;background:var(--red);width:0%;transition:width .3s}
 .how-section{background:var(--gray-light);padding:56px 24px;text-align:center}
 .how-section h2{font-size:1.5rem;font-weight:800;margin-bottom:40px}
 .how-steps{max-width:800px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
@@ -70,19 +85,19 @@ footer a{color:var(--red);text-decoration:none;font-weight:700}
         <div class="dropdown-menu">
           <div class="dropdown-col">
             <h5>PDFに変換</h5>
-            <a href="jpg-to-pdf.html">🖼️ JPEG PDF 変換</a>
-            <a href="word-to-pdf.html">📝 WORD PDF 変換</a>
-            <a href="ppt-to-pdf.html">📊 POWERPOINT PDF 変換</a>
-            <a href="excel-to-pdf.html">📈 EXCEL PDF 変換</a>
-            <a href="html-to-pdf.html">🌐 HTMLからPDF</a>
+            <a href="jpg-to-pdf.html">🖼️ JPEG → PDF</a>
+            <a href="word-to-pdf.html">📝 WORD → PDF</a>
+            <a href="ppt-to-pdf.html" class="active">📊 POWERPOINT → PDF</a>
+            <a href="excel-to-pdf.html">📈 EXCEL → PDF</a>
+            <a href="html-to-pdf.html">🌐 HTML → PDF</a>
           </div>
           <div class="dropdown-col">
             <h5>PDFから変換</h5>
-            <a href="pdf-to-jpg.html">📸 PDF JPEG 変換</a>
-            <a href="pdf-to-word.html">📝 PDF WORD 変換</a>
-            <a href="pdf-to-ppt.html">📊 PDF POWERPOINT 変換</a>
-            <a href="pdf-to-excel.html">📈 PDF EXCEL 変換</a>
-            <a href="pdf-to-pdfa.html">📄 PDFからPDF/A</a>
+            <a href="pdf-to-jpg.html">📸 PDF → JPEG</a>
+            <a href="pdf-to-word.html">📝 PDF → WORD</a>
+            <a href="pdf-to-ppt.html">📊 PDF → POWERPOINT</a>
+            <a href="pdf-to-excel.html">📈 PDF → EXCEL</a>
+            <a href="pdf-to-pdfa.html">📄 PDF → PDF/A</a>
           </div>
         </div>
       </li>
@@ -97,49 +112,344 @@ footer a{color:var(--red);text-decoration:none;font-weight:700}
 
 <section class="tool-hero">
   <div class="big-icon">📊</div>
-  <h1>POWERPOINT PDF 変換</h1>
-  <p>PowerPointプレゼンテーションをPDFに変換します。アニメーション、画像、テキストをすべて保持します。</p>
+  <h1>POWERPOINT → PDF 変換</h1>
+  <p>PowerPointファイル(.pptx)をPDFとして保存します。</p>
 </section>
 
-<div class="cs-section">
-  <div class="cs-badge">🚀 近日公開</div>
-  <h2>この機能は近日公開予定です</h2>
-  <p>現在開発中です。公開までしばらくお待ちください。メールアドレスを登録すると、公開時にお知らせします。</p>
-  <div class="features-preview">
-    <div class="feature-item"><div class="fi-icon">🎨</div><h4>デザイン完全保持</h4><p>アニメーション以外のすべてのデザインを保持</p></div>
-    <div class="feature-item"><div class="fi-icon">📸</div><h4>高品質画像</h4><p>埋め込み画像を高解像度で変換</p></div>
-    <div class="feature-item"><div class="fi-icon">📝</div><h4>ノート付き変換</h4><p>発表者ノートをPDFに含めることも可能</p></div>
-    <div class="feature-item"><div class="fi-icon">💾</div><h4>軽量PDF</h4><p>ファイルサイズを最適化</p></div>
+<div class="upload-section">
+  <div class="drop-zone" id="dropZone">
+    <div class="dz-icon">📊</div>
+    <h3>PPTXファイルをここにドロップ</h3>
+    <p>.pptx ファイルに対応</p>
+    <button class="dz-btn" id="selectBtn">ファイルを選択</button>
+    <input type="file" id="fileInput" accept=".pptx" style="display:none">
   </div>
-  <form class="notify-form" onsubmit="subscribe(event)">
-    <input type="email" placeholder="メールアドレスを入力" required>
-    <button type="submit">通知を受け取る</button>
-  </form>
-  <p class="notify-note">公開時にお知らせします。迷惑メールは送信しません。</p>
-  <a href="index.html" class="cs-back">← すべてのPDFツールに戻る</a>
+
+  <div class="options-panel" id="optionsPanel">
+    <h3>📊 スライドプレビュー</h3>
+    <div class="pdf-info">
+      <span class="pdi">📊</span>
+      <div>
+        <h4 id="fileName">ファイル名</h4>
+        <small id="fileDetails">読み込み中...</small>
+      </div>
+    </div>
+    <div class="info-note">
+      ℹ️ テキストコンテンツを抽出してスライドをプレビューします。「PDFとして保存」ボタンで印刷ダイアログを開き、「PDFとして保存」を選択してください。<strong>画像・グラフ・アニメーションは含まれません。</strong>
+    </div>
+
+    <div class="slide-preview-grid" id="slideGrid"></div>
+
+    <div class="prog-wrap" id="progWrap">
+      <div class="prog-bar" id="progBar"></div>
+    </div>
+    <div class="status" id="status"></div>
+
+    <div class="actions">
+      <button class="action-btn action-btn-primary" id="printBtn">🖨️ PDFとして保存</button>
+      <button class="action-btn action-btn-secondary" id="resetBtn">別のファイルを選択</button>
+    </div>
+  </div>
 </div>
 
 <section class="how-section">
-  <h2>使い方（公開後）</h2>
+  <h2>使い方</h2>
   <div class="how-steps">
-    <div class="how-step"><div class="sn">1</div><h3>PPTXをアップロード</h3><p>.pptxファイルをドラッグ＆ドロップ</p></div>
-    <div class="how-step"><div class="sn">2</div><h3>変換設定を選択</h3><p>ノート表示やページサイズを設定</p></div>
-    <div class="how-step"><div class="sn">3</div><h3>PDFをダウンロード</h3><p>変換されたPDFをダウンロード</p></div>
+    <div class="how-step">
+      <div class="sn">1</div>
+      <h3>PPTXをアップロード</h3>
+      <p>PowerPointファイルをドロップまたは選択します</p>
+    </div>
+    <div class="how-step">
+      <div class="sn">2</div>
+      <h3>スライドを確認</h3>
+      <p>抽出されたテキスト内容のプレビューを確認します</p>
+    </div>
+    <div class="how-step">
+      <div class="sn">3</div>
+      <h3>PDFとして保存</h3>
+      <p>印刷ダイアログで「PDFとして保存」を選択します</p>
+    </div>
   </div>
 </section>
 
 <footer>
-  <p>© 2024 weLovePDF. すべてのPDFツールを無料で使用できます。 | <a href="index.html">ホームへ戻る</a></p>
+  <p>© 2024 <a href="index.html">weLovePDF</a> — すべてのPDFツール</p>
 </footer>
 
 <script>
-function subscribe(e){
-  e.preventDefault();
-  const btn=e.target.querySelector('button');
-  btn.textContent='✓ 登録完了！';
-  btn.style.background='#28a745';
-  e.target.querySelector('input').disabled=true;
-  btn.disabled=true;
+let currentFile = null;
+let slidesData = [];
+
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const optionsPanel = document.getElementById('optionsPanel');
+
+document.getElementById('selectBtn').addEventListener('click', function(e) { e.stopPropagation(); fileInput.click(); });
+dropZone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', e => { if (e.target.files[0]) loadFile(e.target.files[0]); });
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('drag-over');
+  const f = e.dataTransfer.files[0];
+  if (f && (f.name.endsWith('.pptx') || f.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation')) loadFile(f);
+  else setStatus('.pptxファイルを選択してください', true);
+});
+document.getElementById('printBtn').addEventListener('click', savePDF);
+document.getElementById('resetBtn').addEventListener('click', resetTool);
+
+function getSlideColors(xmlText) {
+  // Try to extract background color from XML
+  const bgMatch = xmlText.match(/p:bg[^>]*>.*?<a:srgbClr val="([0-9A-Fa-f]{6})"/s);
+  if (bgMatch) return { bg: '#' + bgMatch[1] };
+  const solidMatch = xmlText.match(/<p:sp>[\s\S]*?<p:spPr>[\s\S]*?<a:solidFill>[\s\S]*?<a:srgbClr val="([0-9A-Fa-f]{6})"/);
+  if (solidMatch) return { bg: '#' + solidMatch[1] };
+  return null;
+}
+
+async function loadFile(file) {
+  currentFile = file;
+  document.getElementById('fileName').textContent = file.name;
+  document.getElementById('fileDetails').textContent = '読み込み中...';
+  dropZone.style.display = 'none';
+  optionsPanel.style.display = 'block';
+  document.getElementById('progWrap').style.display = 'block';
+  setStatus('PPTXを解析中...');
+  setProgress(10);
+
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const zip = await JSZip.loadAsync(arrayBuffer);
+
+    // Get slide files sorted by number
+    const slideFiles = Object.keys(zip.files)
+      .filter(f => /^ppt\/slides\/slide\d+\.xml$/.test(f))
+      .sort((a, b) => {
+        const na = parseInt(a.match(/slide(\d+)/)[1]);
+        const nb = parseInt(b.match(/slide(\d+)/)[1]);
+        return na - nb;
+      });
+
+    slidesData = [];
+    const total = slideFiles.length;
+
+    for (let i = 0; i < slideFiles.length; i++) {
+      setProgress(10 + (i / total) * 80);
+      const xml = await zip.files[slideFiles[i]].async('text');
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(xml, 'text/xml');
+
+      // Extract all text runs
+      const textEls = doc.querySelectorAll('t');
+      const texts = [];
+      textEls.forEach(el => {
+        const t = el.textContent.trim();
+        if (t) texts.push(t);
+      });
+
+      // Try to get a title (first paragraph with larger font or first text block)
+      const paraEls = doc.querySelectorAll('txBody p');
+      let title = '';
+      let bodyTexts = [];
+
+      for (const para of paraEls) {
+        const paraText = Array.from(para.querySelectorAll('t')).map(t => t.textContent).join('').trim();
+        if (!paraText) continue;
+        if (!title) { title = paraText; }
+        else { bodyTexts.push(paraText); }
+      }
+
+      // Try to get background color
+      let bgColor = null;
+      const bgMatch = xml.match(/<a:solidFill[^>]*>\s*<a:srgbClr val="([0-9A-Fa-f]{6})"/);
+      if (bgMatch) bgColor = '#' + bgMatch[1];
+
+      // Try slide layout background
+      const schemeMatch = xml.match(/<a:schemeClr val="([^"]+)"/);
+
+      slidesData.push({ title, bodyTexts, allTexts: texts, bgColor, index: i + 1 });
+    }
+
+    document.getElementById('fileDetails').textContent = total + ' スライド・' + (file.size / 1024).toFixed(1) + ' KB';
+    setProgress(95);
+    renderSlideGrid();
+    setProgress(100);
+    setStatus('');
+    setTimeout(() => { document.getElementById('progWrap').style.display = 'none'; }, 600);
+  } catch(e) {
+    setStatus('ファイルの読み込みに失敗しました: ' + e.message, true);
+    console.error(e);
+  }
+}
+
+// Predefined gradient backgrounds for visual variety
+const gradients = [
+  'linear-gradient(135deg,#667eea,#764ba2)',
+  'linear-gradient(135deg,#f093fb,#f5576c)',
+  'linear-gradient(135deg,#4facfe,#00f2fe)',
+  'linear-gradient(135deg,#43e97b,#38f9d7)',
+  'linear-gradient(135deg,#fa709a,#fee140)',
+  'linear-gradient(135deg,#a18cd1,#fbc2eb)',
+  'linear-gradient(135deg,#ffecd2,#fcb69f)',
+  'linear-gradient(135deg,#a1c4fd,#c2e9fb)',
+];
+
+function renderSlideGrid() {
+  const grid = document.getElementById('slideGrid');
+  grid.innerHTML = '';
+
+  for (const slide of slidesData) {
+    const bg = gradients[(slide.index - 1) % gradients.length];
+    const card = document.createElement('div');
+    card.className = 'slide-card';
+
+    const header = document.createElement('div');
+    header.className = 'slide-card-header';
+    header.style.background = bg;
+    header.innerHTML = '<span class="slide-num">スライド ' + slide.index + '</span>';
+    card.appendChild(header);
+
+    const body = document.createElement('div');
+    body.className = 'slide-card-body';
+
+    if (slide.title) {
+      const titleEl = document.createElement('div');
+      titleEl.className = 'slide-title';
+      titleEl.textContent = slide.title.length > 60 ? slide.title.substring(0, 60) + '...' : slide.title;
+      body.appendChild(titleEl);
+    }
+
+    if (slide.bodyTexts.length > 0) {
+      const textsEl = document.createElement('div');
+      textsEl.className = 'slide-texts';
+      const showTexts = slide.bodyTexts.slice(0, 4);
+      showTexts.forEach(t => {
+        const p = document.createElement('p');
+        p.textContent = '• ' + (t.length > 70 ? t.substring(0, 70) + '...' : t);
+        textsEl.appendChild(p);
+      });
+      if (slide.bodyTexts.length > 4) {
+        const more = document.createElement('p');
+        more.style.color = '#aaa';
+        more.textContent = '...他 ' + (slide.bodyTexts.length - 4) + ' 項目';
+        textsEl.appendChild(more);
+      }
+      body.appendChild(textsEl);
+    }
+
+    if (!slide.title && slide.allTexts.length === 0) {
+      const empty = document.createElement('p');
+      empty.style.cssText = 'color:#aaa;font-size:.8rem;font-style:italic';
+      empty.textContent = '（テキストなし）';
+      body.appendChild(empty);
+    }
+
+    card.appendChild(body);
+    grid.appendChild(card);
+  }
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function savePDF() {
+  if (slidesData.length === 0) { setStatus('先にファイルを読み込んでください', true); return; }
+
+  let slidesHTML = '';
+  for (const slide of slidesData) {
+    const bg = gradients[(slide.index - 1) % gradients.length];
+    slidesHTML += `
+    <div class="slide-page">
+      <div class="slide-header" style="background:${bg}">
+        <span class="slide-label">スライド ${slide.index}</span>
+      </div>
+      <div class="slide-content">
+        ${slide.title ? `<h2>${escapeHtml(slide.title)}</h2>` : ''}
+        ${slide.bodyTexts.map(t => `<p class="body-text">• ${escapeHtml(t)}</p>`).join('')}
+        ${(!slide.title && slide.bodyTexts.length === 0) ? '<p class="empty-note">（テキストなし）</p>' : ''}
+      </div>
+    </div>`;
+  }
+
+  const printWin = window.open('', '_blank');
+  if (!printWin) { setStatus('ポップアップがブロックされました。ポップアップを許可してください。', true); return; }
+
+  printWin.document.write(`<!DOCTYPE html><html><head>
+    <meta charset="UTF-8">
+    <title>${escapeHtml(currentFile ? currentFile.name : 'Presentation')}</title>
+    <style>
+      @page { size: A4 landscape; margin: 8mm; }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: Arial, sans-serif; color: #333; background: #f0f0f0; }
+      .slide-page {
+        width: 100%;
+        background: #fff;
+        border-radius: 4px;
+        margin-bottom: 8mm;
+        page-break-inside: avoid;
+        page-break-after: always;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,.15);
+        min-height: 160mm;
+        display: flex;
+        flex-direction: column;
+      }
+      .slide-header {
+        padding: 10mm 14mm 6mm;
+        color: white;
+      }
+      .slide-label {
+        font-size: 9pt;
+        opacity: 0.8;
+        font-weight: bold;
+      }
+      .slide-content {
+        padding: 10mm 14mm;
+        flex: 1;
+      }
+      h2 {
+        font-size: 18pt;
+        font-weight: bold;
+        color: #222;
+        margin-bottom: 8mm;
+        line-height: 1.3;
+        border-bottom: 2px solid #e2413e;
+        padding-bottom: 3mm;
+      }
+      .body-text {
+        font-size: 11pt;
+        color: #444;
+        margin-bottom: 3mm;
+        line-height: 1.6;
+      }
+      .empty-note {
+        font-size: 10pt;
+        color: #aaa;
+        font-style: italic;
+      }
+    </style>
+  </head><body>${slidesHTML}</body></html>`);
+  printWin.document.close();
+  printWin.onload = () => { setTimeout(() => printWin.print(), 300); };
+}
+
+function setProgress(pct) { document.getElementById('progBar').style.width = pct + '%'; }
+function setStatus(msg, isErr) {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = 'status' + (isErr ? ' err' : '');
+}
+function resetTool() {
+  currentFile = null; slidesData = [];
+  fileInput.value = '';
+  dropZone.style.display = 'block';
+  optionsPanel.style.display = 'none';
+  document.getElementById('slideGrid').innerHTML = '';
+  document.getElementById('progWrap').style.display = 'none';
+  document.getElementById('progBar').style.width = '0%';
+  setStatus('');
 }
 </script>
 </body>
