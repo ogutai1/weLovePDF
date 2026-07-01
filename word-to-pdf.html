@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WORD PDF 変換 | weLovePDF</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --red: #e2413e; --red-dark: #c0302d; --gray-light: #f5f5f5; --gray: #888; --text: #333; --white: #fff; }
+body { font-family: 'Segoe UI', Arial, sans-serif; color: var(--text); background: var(--white); }
+header { background: var(--white); border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 300; }
+nav { max-width: 1200px; margin: 0 auto; padding: 0 24px; height: 60px; display: flex; align-items: center; gap: 4px; }
+.logo { font-size: 1.4rem; font-weight: 800; color: var(--red); text-decoration: none; margin-right: 20px; }
+.logo span { color: var(--text); }
+.nav-links { display: flex; gap: 2px; list-style: none; align-items: center; }
+.nav-links > li > a { display: flex; align-items: center; gap: 4px; text-decoration: none; color: var(--text); font-size: 0.88rem; font-weight: 500; padding: 8px 12px; border-radius: 6px; white-space: nowrap; }
+.nav-links > li > a:hover { background: #f5f5f5; color: var(--red); }
+.nav-dropdown { position: relative; }
+.dropdown-menu { display: none; position: absolute; top: calc(100% + 6px); left: 0; background: var(--white); border: 1px solid #eee; border-radius: 12px; padding: 20px 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.12); z-index: 400; gap: 32px; min-width: 480px; }
+.nav-dropdown:hover .dropdown-menu { display: flex; }
+.dropdown-col { min-width: 190px; }
+.dropdown-col h5 { font-size: 0.75rem; color: #aaa; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; font-weight: 700; }
+.dropdown-col a { display: block; color: var(--text); text-decoration: none; font-size: 0.86rem; padding: 5px 6px; border-radius: 6px; }
+.dropdown-col a:hover { background: #fff5f5; color: var(--red); }
+.nav-right { display: flex; gap: 12px; margin-left: auto; }
+.btn-outline { padding: 7px 18px; border: 1.5px solid var(--red); color: var(--red); border-radius: 6px; font-size: 0.88rem; font-weight: 600; background: transparent; text-decoration: none; }
+.btn-solid { padding: 7px 18px; background: var(--red); color: var(--white); border: none; border-radius: 6px; font-size: 0.88rem; font-weight: 600; cursor: pointer; text-decoration: none; }
+.tool-hero { background: linear-gradient(135deg, #fff 0%, #fff5f5 100%); text-align: center; padding: 56px 24px 40px; }
+.tool-hero .big-icon { font-size: 3.5rem; margin-bottom: 20px; }
+.tool-hero h1 { font-size: 2rem; font-weight: 800; margin-bottom: 12px; }
+.tool-hero p { color: #555; font-size: 1rem; max-width: 560px; margin: 0 auto; line-height: 1.7; }
+.upload-section { max-width: 800px; margin: 48px auto; padding: 0 24px 64px; }
+.drop-zone { border: 2.5px dashed #ddd; border-radius: 16px; padding: 56px 24px; text-align: center; cursor: pointer; background: var(--gray-light); transition: all 0.2s; }
+.drop-zone:hover, .drop-zone.drag-over { border-color: var(--red); background: #fff5f5; }
+.drop-zone .dz-icon { font-size: 3rem; margin-bottom: 16px; }
+.drop-zone h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
+.drop-zone p { color: var(--gray); font-size: 0.9rem; }
+.dz-btn { display: inline-block; margin-top: 20px; padding: 12px 32px; background: var(--red); color: var(--white); border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; border: none; }
+.status { margin-top: 12px; font-size: 0.9rem; color: var(--gray); text-align: center; min-height: 24px; }
+.status.err { color: #dc3545; }
+.file-info { margin-top: 20px; display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--gray-light); border-radius: 10px; }
+.file-info .fi-icon { font-size: 1.8rem; flex-shrink: 0; }
+.file-info .fi-name { font-size: 0.9rem; font-weight: 600; word-break: break-all; }
+.file-info .fi-size { font-size: 0.8rem; color: var(--gray); margin-top: 2px; }
+.how-section { background: var(--gray-light); padding: 56px 24px; text-align: center; }
+.how-section h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 40px; }
+.how-steps { max-width: 800px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.how-step { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.sn { width: 40px; height: 40px; background: var(--red); color: var(--white); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem; flex-shrink: 0; }
+.how-step h3 { font-size: 0.95rem; font-weight: 700; }
+.how-step p { font-size: 0.85rem; color: var(--gray); }
+footer { background: #2d2d2d; color: #ccc; text-align: center; padding: 24px; font-size: 0.85rem; }
+footer a { color: var(--red); text-decoration: none; font-weight: 700; }
+
+/* Preview styles */
+.preview-section { margin-top: 20px; display: none; }
+.preview-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.preview-label { font-size: 0.82rem; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.5px; }
+.preview-content { border: 1.5px solid #eee; border-radius: 10px; padding: 28px 32px; max-height: 450px; overflow-y: auto; background: white; font-size: 0.9rem; line-height: 1.8; }
+.preview-content h1 { font-size: 1.4rem; margin: 0.8em 0 0.4em; }
+.preview-content h2 { font-size: 1.2rem; margin: 0.7em 0 0.3em; }
+.preview-content p { margin: 0.4em 0; }
+.preview-content table { border-collapse: collapse; width: 100%; }
+.preview-content td, .preview-content th { border: 1px solid #ddd; padding: 4px 8px; }
+.preview-content ul, .preview-content ol { padding-left: 2em; margin: 0.3em 0; }
+.actions { margin-top: 20px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.action-btn-primary { padding: 14px 36px; border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; border: none; background: var(--red); color: var(--white); }
+.action-btn-primary:hover { background: var(--red-dark); }
+.action-btn-primary:disabled { background: #ccc; cursor: not-allowed; }
+.action-note { font-size: 0.82rem; color: var(--gray); }
+</style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <a href="index.html" class="logo">we<span>Love</span>PDF</a>
+    <ul class="nav-links">
+      <li><a href="merge.html">PDF 結合</a></li>
+      <li><a href="split.html">PDF 分割</a></li>
+      <li><a href="compress.html">PDF 圧縮</a></li>
+      <li class="nav-dropdown">
+        <a href="#">PDF 変換 ▾</a>
+        <div class="dropdown-menu">
+          <div class="dropdown-col">
+            <h5>PDFに変換</h5>
+            <a href="jpg-to-pdf.html">🖼️ JPEG PDF 変換</a>
+            <a href="word-to-pdf.html">📝 WORD PDF 変換</a>
+            <a href="ppt-to-pdf.html">📊 POWERPOINT PDF 変換</a>
+            <a href="excel-to-pdf.html">📈 EXCEL PDF 変換</a>
+            <a href="html-to-pdf.html">🌐 HTMLからPDF</a>
+          </div>
+          <div class="dropdown-col">
+            <h5>PDFから変換</h5>
+            <a href="pdf-to-jpg.html">📸 PDF JPEG 変換</a>
+            <a href="pdf-to-word.html">📝 PDF WORD 変換</a>
+            <a href="pdf-to-ppt.html">📊 PDF POWERPOINT 変換</a>
+            <a href="pdf-to-excel.html">📈 PDF EXCEL 変換</a>
+            <a href="pdf-to-pdfa.html">📄 PDFからPDF/A</a>
+          </div>
+        </div>
+      </li>
+      <li><a href="index.html">すべてのPDFツール</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="#" class="btn-outline">ログイン</a>
+      <a href="#" class="btn-solid">無料登録</a>
+    </div>
+  </nav>
+</header>
+
+<section class="tool-hero">
+  <div class="big-icon">📝</div>
+  <h1>WORD PDF 変換</h1>
+  <p>.docxファイルをHTMLに変換してプレビューし、ブラウザの印刷機能でPDFとして保存できます。</p>
+</section>
+
+<section class="upload-section">
+  <input type="file" id="fileInput" accept=".docx,.doc" style="display:none">
+
+  <div class="drop-zone" id="dropZone">
+    <div class="dz-icon">📝</div>
+    <h3>DOCXファイルをここにドラッグ＆ドロップ</h3>
+    <p>.docx、.doc形式のWordファイルに対応</p>
+    <button class="dz-btn" id="selectBtn">ファイルを選択</button>
+  </div>
+
+  <div class="status" id="status"></div>
+
+  <div class="file-info" id="fileInfo" style="display:none">
+    <div class="fi-icon">📄</div>
+    <div>
+      <div class="fi-name" id="fileName"></div>
+      <div class="fi-size" id="fileSize"></div>
+    </div>
+  </div>
+
+  <div class="preview-section" id="previewSection">
+    <div class="preview-header">
+      <span class="preview-label">プレビュー</span>
+    </div>
+    <div class="preview-content" id="previewContent"></div>
+    <div class="actions">
+      <button class="action-btn-primary" id="printBtn" disabled onclick="printAsPdf()">📄 PDFとして保存する</button>
+      <span class="action-note">プレビューの内容がPDFに保存されます</span>
+    </div>
+  </div>
+
+</section>
+
+<section class="how-section">
+  <h2>使い方</h2>
+  <div class="how-steps">
+    <div class="how-step">
+      <div class="sn">1</div>
+      <h3>DOCXファイルをアップロード</h3>
+      <p>.docxファイルをドラッグ＆ドロップするか、クリックして選択します</p>
+    </div>
+    <div class="how-step">
+      <div class="sn">2</div>
+      <h3>プレビューを確認</h3>
+      <p>変換されたHTMLプレビューで内容を確認します</p>
+    </div>
+    <div class="how-step">
+      <div class="sn">3</div>
+      <h3>PDFで保存</h3>
+      <p>「PDFとして保存」ボタンをクリックし、印刷ダイアログでPDFを保存します</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  &copy; 2024 weLovePDF &nbsp;|&nbsp; <a href="index.html">ホームに戻る</a>
+</footer>
+
+<script>
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const statusEl = document.getElementById('status');
+const fileInfo = document.getElementById('fileInfo');
+const fileName = document.getElementById('fileName');
+const fileSize = document.getElementById('fileSize');
+const previewSection = document.getElementById('previewSection');
+const previewContent = document.getElementById('previewContent');
+const printBtn = document.getElementById('printBtn');
+
+let currentHtmlContent = '';
+let currentFileName = '';
+
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) handleFile(file);
+});
+dropZone.addEventListener('click', () => fileInput.click());
+document.getElementById('selectBtn').addEventListener('click', e => { e.stopPropagation(); fileInput.click(); });
+fileInput.addEventListener('change', () => {
+  if (fileInput.files[0]) handleFile(fileInput.files[0]);
+  fileInput.value = '';
+});
+
+function setStatus(msg) {
+  statusEl.textContent = msg;
+  statusEl.className = 'status';
+}
+
+function showError(msg) {
+  statusEl.textContent = msg;
+  statusEl.className = 'status err';
+}
+
+function handleFile(file) {
+  if (!file.name.match(/\.(docx|doc)$/i)) {
+    showError('エラー: .docxまたは.docファイルを選択してください');
+    return;
+  }
+
+  currentFileName = file.name.replace(/\.[^.]+$/, '') + '.pdf';
+  fileName.textContent = file.name;
+  fileSize.textContent = (file.size / 1024).toFixed(1) + ' KB';
+  fileInfo.style.display = 'flex';
+
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    try {
+      setStatus('変換中...');
+      const result = await mammoth.convertToHtml({ arrayBuffer: e.target.result });
+
+      if (result.messages && result.messages.length > 0) {
+        const warnings = result.messages.filter(m => m.type === 'warning');
+        if (warnings.length > 0) {
+          setStatus('変換完了（' + warnings.length + '件の警告があります）');
+        } else {
+          setStatus('');
+        }
+      } else {
+        setStatus('');
+      }
+
+      previewContent.innerHTML = result.value || '<p style="color:#888">内容が空です</p>';
+      previewSection.style.display = 'block';
+      printBtn.disabled = false;
+      currentHtmlContent = result.value;
+    } catch(err) {
+      showError('変換エラー: ' + err.message + ' — .docxファイルか確認してください');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function printAsPdf() {
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html>
+<html lang="ja"><head>
+<meta charset="UTF-8">
+<title>${currentFileName}</title>
+<style>
+  body { font-family: 'Hiragino Sans', 'Yu Gothic', 'Segoe UI', Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 40px; line-height: 1.8; font-size: 11pt; color: #333; }
+  h1 { font-size: 20pt; margin: 1em 0 0.5em; }
+  h2 { font-size: 16pt; margin: 1em 0 0.4em; }
+  h3 { font-size: 13pt; margin: 0.8em 0 0.3em; }
+  p { margin: 0.5em 0; }
+  table { border-collapse: collapse; width: 100%; margin: 1em 0; }
+  td, th { border: 1px solid #ccc; padding: 6px 10px; }
+  ul, ol { padding-left: 2em; margin: 0.5em 0; }
+  @media print { body { margin: 0; padding: 20px; } }
+</style>
+</head><body>
+${currentHtmlContent}
+</body></html>`);
+  win.document.close();
+  win.focus();
+  setTimeout(() => { win.print(); }, 600);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDFを編成 | weLovePDF</title>
+<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --red: #e2413e; --red-dark: #c0302d; --gray-light: #f5f5f5; --gray: #888; --text: #333; --white: #fff; }
+body { font-family: 'Segoe UI', Arial, sans-serif; color: var(--text); background: var(--white); }
+header { background: var(--white); border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 300; }
+nav { max-width: 1200px; margin: 0 auto; padding: 0 24px; height: 60px; display: flex; align-items: center; gap: 4px; }
+.logo { font-size: 1.4rem; font-weight: 800; color: var(--red); text-decoration: none; margin-right: 20px; }
+.logo span { color: var(--text); }
+.nav-links { display: flex; gap: 2px; list-style: none; align-items: center; }
+.nav-links > li > a { display: flex; align-items: center; gap: 4px; text-decoration: none; color: var(--text); font-size: 0.88rem; font-weight: 500; padding: 8px 12px; border-radius: 6px; white-space: nowrap; }
+.nav-links > li > a:hover { background: #f5f5f5; color: var(--red); }
+.nav-dropdown { position: relative; }
+.dropdown-menu { display: none; position: absolute; top: calc(100% + 6px); left: 0; background: var(--white); border: 1px solid #eee; border-radius: 12px; padding: 20px 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.12); z-index: 400; gap: 32px; min-width: 480px; }
+.nav-dropdown:hover .dropdown-menu { display: flex; }
+.dropdown-col { min-width: 190px; }
+.dropdown-col h5 { font-size: 0.75rem; color: #aaa; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; font-weight: 700; }
+.dropdown-col a { display: block; color: var(--text); text-decoration: none; font-size: 0.86rem; padding: 5px 6px; border-radius: 6px; }
+.dropdown-col a:hover { background: #fff5f5; color: var(--red); }
+.nav-right { display: flex; gap: 12px; margin-left: auto; }
+.btn-outline { padding: 7px 18px; border: 1.5px solid var(--red); color: var(--red); border-radius: 6px; font-size: 0.88rem; font-weight: 600; background: transparent; text-decoration: none; }
+.btn-solid { padding: 7px 18px; background: var(--red); color: var(--white); border: none; border-radius: 6px; font-size: 0.88rem; font-weight: 600; cursor: pointer; text-decoration: none; }
+.tool-hero { background: linear-gradient(135deg, #fff 0%, #fff5f5 100%); text-align: center; padding: 56px 24px 40px; }
+.tool-hero .big-icon { font-size: 3.5rem; margin-bottom: 20px; }
+.tool-hero h1 { font-size: 2rem; font-weight: 800; margin-bottom: 12px; }
+.tool-hero p { color: #555; font-size: 1rem; max-width: 560px; margin: 0 auto; line-height: 1.7; }
+.upload-section { max-width: 800px; margin: 48px auto; padding: 0 24px 64px; }
+.drop-zone { border: 2.5px dashed #ddd; border-radius: 16px; padding: 56px 24px; text-align: center; cursor: pointer; background: var(--gray-light); transition: all 0.2s; }
+.drop-zone:hover, .drop-zone.drag-over { border-color: var(--red); background: #fff5f5; }
+.drop-zone .dz-icon { font-size: 3rem; margin-bottom: 16px; }
+.drop-zone h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
+.drop-zone p { color: var(--gray); font-size: 0.9rem; }
+.dz-btn { display: inline-block; margin-top: 20px; padding: 12px 32px; background: var(--red); color: var(--white); border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; border: none; }
+.options-panel { margin-top: 32px; background: var(--white); border: 1.5px solid #eee; border-radius: 14px; padding: 28px; display: none; }
+.options-panel h3 { font-size: 1rem; font-weight: 700; margin-bottom: 20px; }
+.pdf-info { display: flex; align-items: center; gap: 14px; padding: 14px; background: var(--gray-light); border-radius: 10px; margin-bottom: 24px; }
+.pdf-info .pdi { font-size: 1.8rem; }
+.pdf-info h4 { font-size: 0.95rem; font-weight: 700; }
+.pdf-info small { color: var(--gray); font-size: 0.85rem; }
+.actions { margin-top: 24px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.action-btn { padding: 14px 36px; border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; border: none; }
+.action-btn-primary { background: var(--red); color: var(--white); }
+.action-btn-primary:hover { background: var(--red-dark); }
+.action-btn-secondary { background: var(--gray-light); color: var(--text); border: 1.5px solid #ddd; }
+.prog-wrap { margin-top: 20px; background: #eee; border-radius: 8px; overflow: hidden; display: none; }
+.prog-bar { height: 6px; background: var(--red); width: 0%; transition: width 0.3s; }
+.status { margin-top: 12px; font-size: 0.9rem; color: var(--gray); text-align: center; min-height: 24px; }
+.status.err { color: #dc3545; }
+.result-box { margin-top: 24px; padding: 24px; background: #f0fff4; border: 1.5px solid #b8e8c6; border-radius: 12px; text-align: center; display: none; }
+.result-box .ri { font-size: 2.5rem; margin-bottom: 12px; }
+.result-box h3 { font-size: 1.1rem; font-weight: 700; color: #155724; margin-bottom: 8px; }
+.result-box p { color: #555; font-size: 0.9rem; margin-bottom: 16px; }
+.dl-btn { display: inline-block; padding: 12px 32px; background: #28a745; color: var(--white); border-radius: 8px; font-weight: 700; font-size: 0.95rem; cursor: pointer; border: none; }
+.dl-btn:hover { background: #218838; }
+.how-section { background: var(--gray-light); padding: 56px 24px; text-align: center; }
+.how-section h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 40px; }
+.how-steps { max-width: 800px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.how-step { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.sn { width: 40px; height: 40px; background: var(--red); color: var(--white); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem; flex-shrink: 0; }
+.how-step h3 { font-size: 0.95rem; font-weight: 700; }
+.how-step p { font-size: 0.85rem; color: var(--gray); }
+footer { background: #2d2d2d; color: #ccc; text-align: center; padding: 24px; font-size: 0.85rem; }
+footer a { color: var(--red); text-decoration: none; font-weight: 700; }
+.page-list { list-style: none; margin: 0 0 24px 0; display: flex; flex-direction: column; gap: 8px; }
+.page-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--gray-light); border-radius: 10px; cursor: grab; border: 2px solid transparent; user-select: none; transition: all 0.15s; }
+.page-item:hover { border-color: #ddd; background: white; }
+.page-item.dragging { opacity: 0.4; border-color: var(--red); cursor: grabbing; }
+.page-item.drag-over { border-color: #007bff; background: #e8f0ff; }
+.drag-handle { font-size: 1.2rem; color: #bbb; }
+.page-num-badge { background: var(--red); color: white; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; flex-shrink: 0; }
+.page-label { font-size: 0.9rem; font-weight: 600; color: var(--text); }
+.page-orig { font-size: 0.78rem; color: var(--gray); margin-left: auto; }
+.list-instructions { background: #e8f4fd; border: 1px solid #bee5f8; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; font-size: 0.88rem; color: #1a6e9a; display: flex; align-items: center; gap: 8px; }
+</style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <a href="index.html" class="logo">we<span>Love</span>PDF</a>
+    <ul class="nav-links">
+      <li><a href="merge.html">PDF 結合</a></li>
+      <li><a href="split.html">PDF 分割</a></li>
+      <li><a href="compress.html">PDF 圧縮</a></li>
+      <li class="nav-dropdown">
+        <a href="#">PDF 変換 ▾</a>
+        <div class="dropdown-menu">
+          <div class="dropdown-col">
+            <h5>PDFに変換</h5>
+            <a href="jpg-to-pdf.html">🖼️ JPEG PDF 変換</a>
+            <a href="word-to-pdf.html">📝 WORD PDF 変換</a>
+            <a href="ppt-to-pdf.html">📊 POWERPOINT PDF 変換</a>
+            <a href="excel-to-pdf.html">📈 EXCEL PDF 変換</a>
+            <a href="html-to-pdf.html">🌐 HTMLからPDF</a>
+          </div>
+          <div class="dropdown-col">
+            <h5>PDFから変換</h5>
+            <a href="pdf-to-jpg.html">📸 PDF JPEG 変換</a>
+            <a href="pdf-to-word.html">📝 PDF WORD 変換</a>
+            <a href="pdf-to-ppt.html">📊 PDF POWERPOINT 変換</a>
+            <a href="pdf-to-excel.html">📈 PDF EXCEL 変換</a>
+            <a href="pdf-to-pdfa.html">📄 PDFからPDF/A</a>
+          </div>
+        </div>
+      </li>
+      <li><a href="index.html">すべてのPDFツール</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="#" class="btn-outline">ログイン</a>
+      <a href="#" class="btn-solid">無料登録</a>
+    </div>
+  </nav>
+</header>
+
+<section class="tool-hero">
+  <div class="big-icon">📋</div>
+  <h1>PDFを編成</h1>
+  <p>PDFのページを自由に並び替えます。ドラッグ＆ドロップで順番を変更できます。</p>
+</section>
+
+<div class="upload-section">
+  <div class="drop-zone" id="dropZone">
+    <div class="dz-icon">📄</div>
+    <h3>PDFをここにドラッグ＆ドロップ</h3>
+    <p>または下のボタンからファイルを選択</p>
+    <button class="dz-btn" onclick="document.getElementById('fileInput').click()">PDFを選択</button>
+    <input type="file" id="fileInput" accept=".pdf,application/pdf" style="display:none">
+  </div>
+
+  <div class="options-panel" id="optionsPanel">
+    <h3>ページを並び替える</h3>
+
+    <div class="pdf-info" id="pdfInfo">
+      <div class="pdi">📄</div>
+      <div>
+        <h4 id="infoName">—</h4>
+        <small id="infoMeta">—</small>
+      </div>
+    </div>
+
+    <div class="list-instructions">
+      <span>ℹ️</span>
+      <span>ページをドラッグして並び替えてください</span>
+    </div>
+
+    <ul class="page-list" id="pageList"></ul>
+
+    <div class="prog-wrap" id="progWrap">
+      <div class="prog-bar" id="progBar"></div>
+    </div>
+    <div class="status" id="status"></div>
+
+    <div class="result-box" id="resultBox">
+      <div class="ri">✅</div>
+      <h3>並び替え完了！</h3>
+      <p>ページが新しい順序で保存されました。</p>
+      <button class="dl-btn" id="dlBtn">📥 ダウンロード</button>
+    </div>
+
+    <div class="actions">
+      <button class="action-btn action-btn-primary" onclick="processOrganize()">PDFを並び替える</button>
+      <button class="action-btn action-btn-secondary" onclick="resetTool()">リセット</button>
+    </div>
+  </div>
+</div>
+
+<section class="how-section">
+  <h2>使い方</h2>
+  <div class="how-steps">
+    <div class="how-step">
+      <div class="sn">1</div>
+      <h3>PDFをアップロード</h3>
+      <p>PDFをドラッグ＆ドロップするか、クリックして選択します</p>
+    </div>
+    <div class="how-step">
+      <div class="sn">2</div>
+      <h3>ページを並び替え</h3>
+      <p>ページをドラッグして好きな順番に並び替えます</p>
+    </div>
+    <div class="how-step">
+      <div class="sn">3</div>
+      <h3>ダウンロード</h3>
+      <p>新しい順序で保存されたPDFをダウンロードします</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  &copy; 2024 weLovePDF &nbsp;|&nbsp; <a href="index.html">ホームに戻る</a>
+</footer>
+
+<script>
+let dragSrc = null;
+let totalPages = 0;
+let fileArrayBuffer = null;
+let currentFileName = '';
+
+// Drop zone events
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type === 'application/pdf') loadFile(file);
+});
+fileInput.addEventListener('change', e => {
+  if (e.target.files[0]) loadFile(e.target.files[0]);
+});
+
+async function loadFile(file) {
+  currentFileName = file.name;
+  const arrayBuffer = await file.arrayBuffer();
+  fileArrayBuffer = arrayBuffer;
+
+  try {
+    const { PDFDocument } = PDFLib;
+    const pdfDoc = await PDFDocument.load(arrayBuffer);
+    totalPages = pdfDoc.getPageCount();
+
+    document.getElementById('infoName').textContent = file.name;
+    document.getElementById('infoMeta').textContent =
+      (file.size / 1024).toFixed(1) + ' KB　|　' + totalPages + ' ページ';
+
+    renderPageList(totalPages);
+
+    document.getElementById('optionsPanel').style.display = 'block';
+    document.getElementById('resultBox').style.display = 'none';
+    document.getElementById('progWrap').style.display = 'none';
+    document.getElementById('status').textContent = '';
+    document.getElementById('status').className = 'status';
+  } catch(e) {
+    alert('PDFの読み込みに失敗しました: ' + e.message);
+  }
+}
+
+function renderPageList(total) {
+  const list = document.getElementById('pageList');
+  list.innerHTML = '';
+  for (let i = 1; i <= total; i++) {
+    const li = document.createElement('li');
+    li.className = 'page-item';
+    li.draggable = true;
+    li.dataset.pageIndex = i - 1;
+    li.innerHTML =
+      '<span class="drag-handle">⠿</span>' +
+      '<span class="page-num-badge">' + i + '</span>' +
+      '<span class="page-label">ページ ' + i + '</span>' +
+      '<span class="page-orig">元: ' + i + 'ページ目</span>';
+    makeDraggable(li);
+    list.appendChild(li);
+  }
+}
+
+function makeDraggable(item) {
+  item.addEventListener('dragstart', e => {
+    dragSrc = item;
+    item.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', '');
+  });
+  item.addEventListener('dragend', () => {
+    item.classList.remove('dragging');
+    dragSrc = null;
+  });
+  item.addEventListener('dragover', e => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    if (dragSrc && dragSrc !== item) item.classList.add('drag-over');
+  });
+  item.addEventListener('dragleave', () => item.classList.remove('drag-over'));
+  item.addEventListener('drop', e => {
+    e.preventDefault();
+    item.classList.remove('drag-over');
+    if (dragSrc && dragSrc !== item) {
+      const list = item.parentNode;
+      const allItems = [...list.querySelectorAll('.page-item')];
+      const srcIdx = allItems.indexOf(dragSrc);
+      const dstIdx = allItems.indexOf(item);
+      if (srcIdx < dstIdx) list.insertBefore(dragSrc, item.nextSibling);
+      else list.insertBefore(dragSrc, item);
+      updatePositionNumbers();
+    }
+  });
+}
+
+function updatePositionNumbers() {
+  const items = document.querySelectorAll('.page-item');
+  items.forEach((item, i) => {
+    item.querySelector('.page-num-badge').textContent = i + 1;
+    item.querySelector('.page-label').textContent = 'ページ ' + (i + 1);
+  });
+}
+
+function showProgress() {
+  document.getElementById('progWrap').style.display = 'block';
+  document.getElementById('resultBox').style.display = 'none';
+}
+
+function setProgress(pct) {
+  document.getElementById('progBar').style.width = pct + '%';
+}
+
+function setStatus(msg, isErr) {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = 'status' + (isErr ? ' err' : '');
+}
+
+function showResult(bytes, filename) {
+  setStatus('完了しました！');
+  document.getElementById('progWrap').style.display = 'none';
+  const resultBox = document.getElementById('resultBox');
+  resultBox.style.display = 'block';
+  const dlBtn = document.getElementById('dlBtn');
+  dlBtn.onclick = () => {
+    const blob = new Blob([bytes], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+  };
+}
+
+function showError(msg) {
+  document.getElementById('progWrap').style.display = 'none';
+  setStatus(msg, true);
+}
+
+async function processOrganize() {
+  if (!fileArrayBuffer) { alert('まずPDFを選択してください。'); return; }
+
+  const items = [...document.querySelectorAll('.page-item')];
+  const newOrder = items.map(item => parseInt(item.dataset.pageIndex));
+
+  showProgress();
+  setProgress(20);
+  setStatus('PDFを処理中...');
+
+  try {
+    const { PDFDocument } = PDFLib;
+    const srcDoc = await PDFDocument.load(fileArrayBuffer);
+    const newDoc = await PDFDocument.create();
+    setProgress(50);
+    const copiedPages = await newDoc.copyPages(srcDoc, newOrder);
+    copiedPages.forEach(p => newDoc.addPage(p));
+    setProgress(90);
+    const bytes = await newDoc.save();
+    setProgress(100);
+    showResult(bytes, currentFileName.replace('.pdf', '') + '_organized.pdf');
+  } catch(e) {
+    showError('エラー: ' + e.message);
+  }
+}
+
+function resetTool() {
+  fileArrayBuffer = null;
+  currentFileName = '';
+  totalPages = 0;
+  document.getElementById('optionsPanel').style.display = 'none';
+  document.getElementById('fileInput').value = '';
+  document.getElementById('pageList').innerHTML = '';
+  document.getElementById('resultBox').style.display = 'none';
+  document.getElementById('progWrap').style.display = 'none';
+  setStatus('');
+}
+</script>
+
+</body>
+</html>

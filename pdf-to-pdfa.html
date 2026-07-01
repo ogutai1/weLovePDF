@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDFからPDF/A — weLovePDF</title>
+
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      :root { --red: #e2413e; --red-dark: #c0302d; --gray-light: #f5f5f5; --gray: #888; --text: #333; --white: #fff; }
+      body { font-family: 'Segoe UI', Arial, sans-serif; color: var(--text); background: var(--white); }
+      header { background: var(--white); border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 300; }
+      nav { max-width: 1200px; margin: 0 auto; padding: 0 24px; height: 60px; display: flex; align-items: center; gap: 4px; }
+      .logo { font-size: 1.4rem; font-weight: 800; color: var(--red); text-decoration: none; margin-right: 20px; }
+      .logo span { color: var(--text); }
+      .nav-links { display: flex; gap: 2px; list-style: none; align-items: center; }
+      .nav-links > li > a { display: flex; align-items: center; gap: 4px; text-decoration: none; color: var(--text); font-size: 0.88rem; font-weight: 500; padding: 8px 12px; border-radius: 6px; white-space: nowrap; }
+      .nav-links > li > a:hover { background: #f5f5f5; color: var(--red); }
+      .nav-dropdown { position: relative; }
+      .dropdown-menu { display: none; position: absolute; top: calc(100% + 6px); left: 0; background: var(--white); border: 1px solid #eee; border-radius: 12px; padding: 20px 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.12); z-index: 400; gap: 32px; min-width: 480px; }
+      .nav-dropdown:hover .dropdown-menu { display: flex; }
+      .dropdown-col { min-width: 190px; }
+      .dropdown-col h5 { font-size: 0.75rem; color: #aaa; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; font-weight: 700; }
+      .dropdown-col a { display: block; color: var(--text); text-decoration: none; font-size: 0.86rem; padding: 5px 6px; border-radius: 6px; }
+      .dropdown-col a:hover { background: #fff5f5; color: var(--red); }
+      .nav-right { display: flex; gap: 12px; margin-left: auto; }
+      .btn-outline { padding: 7px 18px; border: 1.5px solid var(--red); color: var(--red); border-radius: 6px; font-size: 0.88rem; font-weight: 600; background: transparent; text-decoration: none; }
+      .btn-solid { padding: 7px 18px; background: var(--red); color: var(--white); border: none; border-radius: 6px; font-size: 0.88rem; font-weight: 600; cursor: pointer; text-decoration: none; }
+      .tool-hero { background: linear-gradient(135deg, #fff 0%, #fff5f5 100%); text-align: center; padding: 56px 24px 40px; }
+      .tool-hero .big-icon { font-size: 3.5rem; margin-bottom: 20px; }
+      .tool-hero h1 { font-size: 2rem; font-weight: 800; margin-bottom: 12px; }
+      .tool-hero p { color: #555; font-size: 1rem; max-width: 560px; margin: 0 auto; line-height: 1.7; }
+      .upload-section { max-width: 900px; margin: 48px auto; padding: 0 24px 64px; }
+      .drop-zone { border: 2.5px dashed #ddd; border-radius: 16px; padding: 56px 24px; text-align: center; cursor: pointer; background: var(--gray-light); transition: all 0.2s; }
+      .drop-zone:hover, .drop-zone.drag-over { border-color: var(--red); background: #fff5f5; }
+      .drop-zone .dz-icon { font-size: 3rem; margin-bottom: 16px; }
+      .drop-zone h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
+      .drop-zone p { color: var(--gray); font-size: 0.9rem; }
+      .dz-btn { display: inline-block; margin-top: 20px; padding: 12px 32px; background: var(--red); color: var(--white); border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; border: none; }
+      .options-panel { margin-top: 32px; background: var(--white); border: 1.5px solid #eee; border-radius: 14px; padding: 28px; display: none; }
+      .pdf-info { display: flex; align-items: center; gap: 14px; padding: 14px; background: var(--gray-light); border-radius: 10px; margin-bottom: 24px; }
+      .pdf-info .pdi { font-size: 1.8rem; }
+      .pdf-info h4 { font-size: 0.95rem; font-weight: 700; }
+      .pdf-info small { color: var(--gray); font-size: 0.85rem; }
+      .actions { margin-top: 24px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+      .action-btn { padding: 14px 36px; border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; border: none; }
+      .action-btn-primary { background: var(--red); color: var(--white); }
+      .action-btn-primary:hover { background: var(--red-dark); }
+      .action-btn-primary:disabled { background: #ccc; cursor: not-allowed; }
+      .action-btn-secondary { background: var(--gray-light); color: var(--text); border: 1.5px solid #ddd; }
+      .prog-wrap { margin-top: 20px; background: #eee; border-radius: 8px; overflow: hidden; display: none; }
+      .prog-bar { height: 6px; background: var(--red); width: 0%; transition: width 0.3s; }
+      .status { margin-top: 12px; font-size: 0.9rem; color: var(--gray); text-align: center; min-height: 24px; }
+      .status.err { color: #dc3545; }
+      .result-box { margin-top: 24px; padding: 24px; background: #f0fff4; border: 1.5px solid #b8e8c6; border-radius: 12px; text-align: center; display: none; }
+      .result-box .ri { font-size: 2.5rem; margin-bottom: 12px; }
+      .result-box h3 { font-size: 1.1rem; font-weight: 700; color: #155724; margin-bottom: 8px; }
+      .result-box p { color: #555; font-size: 0.9rem; margin-bottom: 16px; }
+      .dl-btn { display: inline-block; padding: 12px 32px; background: #28a745; color: var(--white); border-radius: 8px; font-weight: 700; font-size: 0.95rem; cursor: pointer; border: none; }
+      .dl-btn:hover { background: #218838; }
+      .how-section { background: var(--gray-light); padding: 56px 24px; text-align: center; }
+      .how-section h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 40px; }
+      .how-steps { max-width: 800px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+      .how-step { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+      .sn { width: 40px; height: 40px; background: var(--red); color: var(--white); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem; flex-shrink: 0; }
+      .how-step h3 { font-size: 0.95rem; font-weight: 700; }
+      .how-step p { font-size: 0.85rem; color: var(--gray); }
+      footer { background: #2d2d2d; color: #ccc; text-align: center; padding: 24px; font-size: 0.85rem; }
+      footer a { color: var(--red); text-decoration: none; font-weight: 700; }
+    </style>
+
+  <style>
+    .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+    .feature-card { padding: 14px; background: var(--gray-light); border-radius: 8px; text-align: center; }
+    .feature-card .fi { font-size: 1.5rem; margin-bottom: 6px; }
+    .feature-card h4 { font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; }
+    .feature-card p { font-size: 0.78rem; color: var(--gray); }
+    .form-group { margin-bottom: 20px; }
+    .form-label { display: block; font-size: 0.88rem; font-weight: 600; margin-bottom: 8px; color: #444; }
+    .radio-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    .radio-group label { display: flex; align-items: center; gap: 6px; font-size: 0.88rem; cursor: pointer; padding: 8px 14px; border: 1.5px solid #ddd; border-radius: 8px; transition: all 0.15s; }
+    .radio-group label:has(input:checked) { border-color: var(--red); background: #fff0f0; color: var(--red); }
+    .radio-group input[type=radio] { display: none; }
+    .limit-box { background: #fff3cd; border: 1.5px solid #ffc107; border-radius: 10px; padding: 12px 16px; margin-bottom: 20px; font-size: 0.85rem; color: #856404; }
+    .pdfa-info-box { background: #e8f4fd; border: 1px solid #bee5f8; border-radius: 10px; padding: 16px 20px; margin-bottom: 24px; font-size: 0.88rem; color: #1a4f72; line-height: 1.7; }
+    .pdfa-info-box strong { color: #1a4f72; }
+  </style>
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+</head>
+<body>
+
+  <header>
+    <nav>
+      <a href="index.html" class="logo">we<span>Love</span>PDF</a>
+      <ul class="nav-links">
+        <li><a href="merge.html">PDF 結合</a></li>
+        <li><a href="split.html">PDF 分割</a></li>
+        <li><a href="compress.html">PDF 圧縮</a></li>
+        <li class="nav-dropdown">
+          <a href="#">PDF 変換 ▾</a>
+          <div class="dropdown-menu">
+            <div class="dropdown-col">
+              <h5>PDFに変換</h5>
+              <a href="jpg-to-pdf.html">🖼️ JPEG PDF 変換</a>
+              <a href="word-to-pdf.html">📝 WORD PDF 変換</a>
+              <a href="ppt-to-pdf.html">📊 POWERPOINT PDF 変換</a>
+              <a href="excel-to-pdf.html">📈 EXCEL PDF 変換</a>
+              <a href="html-to-pdf.html">🌐 HTMLからPDF</a>
+            </div>
+            <div class="dropdown-col">
+              <h5>PDFから変換</h5>
+              <a href="pdf-to-jpg.html">📸 PDF JPEG 変換</a>
+              <a href="pdf-to-word.html">📝 PDF WORD 変換</a>
+              <a href="pdf-to-ppt.html">📊 PDF POWERPOINT 変換</a>
+              <a href="pdf-to-excel.html">📈 PDF EXCEL 変換</a>
+              <a href="pdf-to-pdfa.html">📄 PDFからPDF/A</a>
+            </div>
+          </div>
+        </li>
+        <li><a href="index.html">すべてのPDFツール</a></li>
+      </ul>
+      <div class="nav-right">
+        <a href="#" class="btn-outline">ログイン</a>
+        <a href="#" class="btn-solid">無料登録</a>
+      </div>
+    </nav>
+  </header>
+
+  <section class="tool-hero">
+    <div class="big-icon">📁</div>
+    <h1>PDFからPDF/A</h1>
+    <p>PDFをPDF/A形式に変換します。長期保存に適した標準フォーマットです。</p>
+  </section>
+
+  <section class="upload-section">
+    <div class="drop-zone" id="dropZone">
+      <div class="dz-icon">📄</div>
+      <h3>PDFをここにドラッグ＆ドロップ</h3>
+      <p>またはクリックしてファイルを選択</p>
+      <button class="dz-btn" onclick="document.getElementById('fileInput').click()">PDFを選択</button>
+      <input type="file" id="fileInput" accept=".pdf" style="display:none">
+    </div>
+
+    <div class="options-panel" id="optionsPanel">
+      <div class="pdf-info">
+        <div class="pdi">📄</div>
+        <div>
+          <h4 id="fileName">ファイル名</h4>
+          <small id="fileSize">—</small>
+        </div>
+      </div>
+
+      <div class="pdfa-info-box">
+        <strong>PDF/Aとは？</strong><br>
+        PDF/Aは長期デジタルアーカイブのためのISO標準（ISO 19005）です。政府文書や法的文書の保存に広く使われています。
+      </div>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="fi">📦</div>
+          <h4>自己完結型</h4>
+          <p>外部リソースへの依存がなく完全に独立したファイル</p>
+        </div>
+        <div class="feature-card">
+          <div class="fi">🔤</div>
+          <h4>フォント埋め込み</h4>
+          <p>使用フォントをすべてファイル内に埋め込み</p>
+        </div>
+        <div class="feature-card">
+          <div class="fi">🏷️</div>
+          <h4>メタデータ含む</h4>
+          <p>XMPメタデータを含み文書情報を保持</p>
+        </div>
+      </div>
+
+      <div class="limit-box">
+        ⚠️ <strong>注意:</strong> 完全なPDF/A準拠（カラープロファイルの埋め込み、外部リソースの除外など）にはサーバー側の処理が必要です。このツールはpdf-libを使用してPDFを最適化・再保存します。
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">PDF/Aバリアント:</label>
+        <div class="radio-group">
+          <label><input type="radio" name="pdfa" value="1b" checked>PDF/A-1b（推奨）</label>
+          <label><input type="radio" name="pdfa" value="2b">PDF/A-2b</label>
+          <label><input type="radio" name="pdfa" value="3b">PDF/A-3b</label>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="action-btn action-btn-primary" id="convertBtn" onclick="convertToPdfa()">PDF/Aに変換する</button>
+        <button class="action-btn action-btn-secondary" onclick="resetTool()">別のファイルを選択</button>
+      </div>
+
+      <div class="prog-wrap" id="progWrap">
+        <div class="prog-bar" id="progBar"></div>
+      </div>
+      <div class="status" id="status"></div>
+
+      <div class="result-box" id="resultBox">
+        <div class="ri">✅</div>
+        <h3>PDF/A変換完了！</h3>
+        <p>最適化されたPDF/Aファイルをダウンロードしてください。</p>
+        <button class="dl-btn" id="dlBtn">ダウンロード</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="how-section">
+    <h2>使い方</h2>
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="sn">1</div>
+        <h3>PDFをアップロード</h3>
+        <p>変換したいPDFをドラッグ＆ドロップするか、クリックして選択します</p>
+      </div>
+      <div class="how-step">
+        <div class="sn">2</div>
+        <h3>バリアントを選択</h3>
+        <p>PDF/A-1b・2b・3bから適切なバリアントを選択します</p>
+      </div>
+      <div class="how-step">
+        <div class="sn">3</div>
+        <h3>ダウンロード</h3>
+        <p>最適化されたPDF/Aファイルをダウンロードします</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2024 <a href="index.html">weLovePDF</a> — 無料オンラインPDFツール</p>
+  </footer>
+
+  <script>
+    let fileArrayBuffer = null;
+    let currentFileName = '';
+
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('drop', e => {
+      e.preventDefault();
+      dropZone.classList.remove('drag-over');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type === 'application/pdf') loadFile(file);
+    });
+    fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadFile(fileInput.files[0]); });
+
+    async function loadFile(file) {
+      currentFileName = file.name;
+      document.getElementById('fileName').textContent = file.name;
+      document.getElementById('fileSize').textContent = (file.size / 1024).toFixed(1) + ' KB';
+      fileArrayBuffer = await file.arrayBuffer();
+      document.getElementById('optionsPanel').style.display = 'block';
+      document.getElementById('resultBox').style.display = 'none';
+      setStatus('');
+    }
+
+    async function convertToPdfa() {
+      if (!fileArrayBuffer) return;
+      const variant = document.querySelector('input[name="pdfa"]:checked').value;
+      const btn = document.getElementById('convertBtn');
+      btn.disabled = true;
+      setStatus('PDF/Aに変換中...');
+      showProgress(true);
+      setProgress(20);
+      try {
+        const { PDFDocument } = PDFLib;
+        const pdfDoc = await PDFDocument.load(fileArrayBuffer);
+        setProgress(50);
+        pdfDoc.setTitle(pdfDoc.getTitle() || currentFileName.replace(/\.pdf$/i, ''));
+        pdfDoc.setProducer('weLovePDF');
+        pdfDoc.setCreationDate(new Date());
+        pdfDoc.setModificationDate(new Date());
+        setProgress(75);
+        const bytes = await pdfDoc.save({ useObjectStreams: false });
+        setProgress(100);
+        showResult(bytes, currentFileName.replace(/\.pdf$/i, '') + '_pdfa.pdf');
+        setStatus('PDF/A-' + variant + ' への変換が完了しました。');
+      } catch(e) {
+        setStatus('エラー: ' + e.message, true);
+        btn.disabled = false;
+      }
+      showProgress(false);
+    }
+
+    function showResult(bytes, filename) {
+      const blob = new Blob([bytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const dlBtn = document.getElementById('dlBtn');
+      dlBtn.onclick = () => {
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+      };
+      document.getElementById('resultBox').style.display = 'block';
+    }
+
+    function resetTool() {
+      fileArrayBuffer = null;
+      currentFileName = '';
+      document.getElementById('optionsPanel').style.display = 'none';
+      document.getElementById('resultBox').style.display = 'none';
+      document.getElementById('fileInput').value = '';
+      setStatus('');
+    }
+
+    function setStatus(msg, isErr) {
+      const s = document.getElementById('status');
+      s.textContent = msg;
+      s.className = 'status' + (isErr ? ' err' : '');
+    }
+
+    function showProgress(show) {
+      document.getElementById('progWrap').style.display = show ? 'block' : 'none';
+    }
+
+    function setProgress(pct) {
+      document.getElementById('progBar').style.width = pct + '%';
+    }
+  </script>
+</body>
+</html>

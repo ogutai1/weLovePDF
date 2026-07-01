@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JPEG PDF 変換 | weLovePDF</title>
+<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --red: #e2413e; --red-dark: #c0302d; --gray-light: #f5f5f5; --gray: #888; --text: #333; --white: #fff; }
+body { font-family: 'Segoe UI', Arial, sans-serif; color: var(--text); background: var(--white); }
+header { background: var(--white); border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 300; }
+nav { max-width: 1200px; margin: 0 auto; padding: 0 24px; height: 60px; display: flex; align-items: center; gap: 4px; }
+.logo { font-size: 1.4rem; font-weight: 800; color: var(--red); text-decoration: none; margin-right: 20px; }
+.logo span { color: var(--text); }
+.nav-links { display: flex; gap: 2px; list-style: none; align-items: center; }
+.nav-links > li > a { display: flex; align-items: center; gap: 4px; text-decoration: none; color: var(--text); font-size: 0.88rem; font-weight: 500; padding: 8px 12px; border-radius: 6px; white-space: nowrap; }
+.nav-links > li > a:hover { background: #f5f5f5; color: var(--red); }
+.nav-dropdown { position: relative; }
+.dropdown-menu { display: none; position: absolute; top: calc(100% + 6px); left: 0; background: var(--white); border: 1px solid #eee; border-radius: 12px; padding: 20px 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.12); z-index: 400; gap: 32px; min-width: 480px; }
+.nav-dropdown:hover .dropdown-menu { display: flex; }
+.dropdown-col { min-width: 190px; }
+.dropdown-col h5 { font-size: 0.75rem; color: #aaa; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; font-weight: 700; }
+.dropdown-col a { display: block; color: var(--text); text-decoration: none; font-size: 0.86rem; padding: 5px 6px; border-radius: 6px; }
+.dropdown-col a:hover { background: #fff5f5; color: var(--red); }
+.nav-right { display: flex; gap: 12px; margin-left: auto; }
+.btn-outline { padding: 7px 18px; border: 1.5px solid var(--red); color: var(--red); border-radius: 6px; font-size: 0.88rem; font-weight: 600; background: transparent; text-decoration: none; }
+.btn-solid { padding: 7px 18px; background: var(--red); color: var(--white); border: none; border-radius: 6px; font-size: 0.88rem; font-weight: 600; cursor: pointer; text-decoration: none; }
+.tool-hero { background: linear-gradient(135deg, #fff 0%, #fff5f5 100%); text-align: center; padding: 56px 24px 40px; }
+.tool-hero .big-icon { font-size: 3.5rem; margin-bottom: 20px; }
+.tool-hero h1 { font-size: 2rem; font-weight: 800; margin-bottom: 12px; }
+.tool-hero p { color: #555; font-size: 1rem; max-width: 560px; margin: 0 auto; line-height: 1.7; }
+.upload-section { max-width: 800px; margin: 48px auto; padding: 0 24px 64px; }
+.drop-zone { border: 2.5px dashed #ddd; border-radius: 16px; padding: 56px 24px; text-align: center; cursor: pointer; background: var(--gray-light); transition: all 0.2s; }
+.drop-zone:hover, .drop-zone.drag-over { border-color: var(--red); background: #fff5f5; }
+.drop-zone .dz-icon { font-size: 3rem; margin-bottom: 16px; }
+.drop-zone h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
+.drop-zone p { color: var(--gray); font-size: 0.9rem; }
+.dz-btn { display: inline-block; margin-top: 20px; padding: 12px 32px; background: var(--red); color: var(--white); border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; border: none; }
+.options-panel { margin-top: 32px; background: var(--white); border: 1.5px solid #eee; border-radius: 14px; padding: 28px; display: none; }
+.options-panel h3 { font-size: 1rem; font-weight: 700; margin-bottom: 20px; }
+.actions { margin-top: 24px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.action-btn { padding: 14px 36px; border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; border: none; }
+.action-btn-primary { background: var(--red); color: var(--white); }
+.action-btn-primary:hover { background: var(--red-dark); }
+.action-btn-secondary { background: var(--gray-light); color: var(--text); border: 1.5px solid #ddd; }
+.prog-wrap { margin-top: 20px; background: #eee; border-radius: 8px; overflow: hidden; display: none; }
+.prog-bar { height: 6px; background: var(--red); width: 0%; transition: width 0.3s; }
+.status { margin-top: 12px; font-size: 0.9rem; color: var(--gray); text-align: center; min-height: 24px; }
+.status.err { color: #dc3545; }
+.result-box { margin-top: 24px; padding: 24px; background: #f0fff4; border: 1.5px solid #b8e8c6; border-radius: 12px; text-align: center; display: none; }
+.result-box .ri { font-size: 2.5rem; margin-bottom: 12px; }
+.result-box h3 { font-size: 1.1rem; font-weight: 700; color: #155724; margin-bottom: 8px; }
+.result-box p { color: #555; font-size: 0.9rem; margin-bottom: 16px; }
+.dl-btn { display: inline-block; padding: 12px 32px; background: #28a745; color: var(--white); border-radius: 8px; font-weight: 700; font-size: 0.95rem; cursor: pointer; border: none; }
+.dl-btn:hover { background: #218838; }
+.how-section { background: var(--gray-light); padding: 56px 24px; text-align: center; }
+.how-section h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 40px; }
+.how-steps { max-width: 800px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.how-step { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.sn { width: 40px; height: 40px; background: var(--red); color: var(--white); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem; flex-shrink: 0; }
+.how-step h3 { font-size: 0.95rem; font-weight: 700; }
+.how-step p { font-size: 0.85rem; color: var(--gray); }
+footer { background: #2d2d2d; color: #ccc; text-align: center; padding: 24px; font-size: 0.85rem; }
+footer a { color: var(--red); text-decoration: none; font-weight: 700; }
+.img-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; max-height: 400px; overflow-y: auto; }
+.img-item { display: flex; align-items: center; gap: 12px; padding: 10px; background: var(--gray-light); border-radius: 8px; }
+.img-thumb { width: 60px; height: 60px; object-fit: contain; border-radius: 4px; background: #ddd; flex-shrink: 0; }
+.img-name { flex: 1; font-size: 0.85rem; font-weight: 500; word-break: break-all; }
+.img-size-label { font-size: 0.78rem; color: var(--gray); }
+.img-actions { display: flex; gap: 4px; flex-shrink: 0; }
+.img-actions button { padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; background: white; font-size: 0.8rem; }
+.img-actions button:hover { background: #f0f0f0; }
+.rm-btn { color: #dc3545; border-color: #fca5a5; }
+.img-count { font-size: 0.88rem; font-weight: 600; color: var(--gray); margin-bottom: 12px; }
+.add-more-btn { display: inline-block; margin-bottom: 16px; padding: 8px 20px; border: 1.5px dashed #ddd; border-radius: 8px; font-size: 0.85rem; color: var(--gray); cursor: pointer; background: white; }
+.add-more-btn:hover { border-color: var(--red); color: var(--red); }
+.form-group { margin-bottom: 20px; }
+.form-label { display: block; font-size: 0.88rem; font-weight: 600; margin-bottom: 8px; color: #444; }
+.radio-group { display: flex; gap: 8px; flex-wrap: wrap; }
+.radio-group label { display: flex; align-items: center; gap: 6px; font-size: 0.88rem; cursor: pointer; padding: 8px 14px; border: 1.5px solid #ddd; border-radius: 8px; transition: all 0.15s; }
+.radio-group label:has(input:checked) { border-color: var(--red); background: #fff0f0; color: var(--red); }
+.radio-group input[type=radio] { display: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <a href="index.html" class="logo">we<span>Love</span>PDF</a>
+    <ul class="nav-links">
+      <li><a href="merge.html">PDF 結合</a></li>
+      <li><a href="split.html">PDF 分割</a></li>
+      <li><a href="compress.html">PDF 圧縮</a></li>
+      <li class="nav-dropdown">
+        <a href="#">PDF 変換 ▾</a>
+        <div class="dropdown-menu">
+          <div class="dropdown-col">
+            <h5>PDFに変換</h5>
+            <a href="jpg-to-pdf.html">🖼️ JPEG PDF 変換</a>
+            <a href="word-to-pdf.html">📝 WORD PDF 変換</a>
+            <a href="ppt-to-pdf.html">📊 POWERPOINT PDF 変換</a>
+            <a href="excel-to-pdf.html">📈 EXCEL PDF 変換</a>
+            <a href="html-to-pdf.html">🌐 HTMLからPDF</a>
+          </div>
+          <div class="dropdown-col">
+            <h5>PDFから変換</h5>
+            <a href="pdf-to-jpg.html">📸 PDF JPEG 変換</a>
+            <a href="pdf-to-word.html">📝 PDF WORD 変換</a>
+            <a href="pdf-to-ppt.html">📊 PDF POWERPOINT 変換</a>
+            <a href="pdf-to-excel.html">📈 PDF EXCEL 変換</a>
+            <a href="pdf-to-pdfa.html">📄 PDFからPDF/A</a>
+          </div>
+        </div>
+      </li>
+      <li><a href="index.html">すべてのPDFツール</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="#" class="btn-outline">ログイン</a>
+      <a href="#" class="btn-solid">無料登録</a>
+    </div>
+  </nav>
+</header>
+
+<section class="tool-hero">
+  <div class="big-icon">🖼️</div>
+  <h1>JPEG PDF 変換</h1>
+  <p>JPGやPNG画像をPDFに変換します。複数の画像を一つのPDFにまとめることもできます。</p>
+</section>
+
+<section class="upload-section">
+  <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
+
+  <div class="drop-zone" id="dropZone">
+    <div class="dz-icon">🖼️</div>
+    <h3>画像をここにドラッグ＆ドロップ</h3>
+    <p>JPG、PNG、GIF、BMP、WEBPなどの画像形式に対応</p>
+    <button class="dz-btn" id="selectBtn">ファイルを選択</button>
+  </div>
+
+  <div class="options-panel" id="optionsPanel">
+    <h3>画像の設定</h3>
+
+    <div class="img-count" id="imgCount">0枚の画像が選択されました</div>
+    <div class="img-list" id="imgList"></div>
+
+    <button class="add-more-btn" id="addMoreBtn">＋ 画像を追加</button>
+
+    <div class="form-group">
+      <label class="form-label">ページサイズ</label>
+      <div class="radio-group">
+        <label><input type="radio" name="pageSize" value="a4" checked> A4 縦</label>
+        <label><input type="radio" name="pageSize" value="a4l"> A4 横</label>
+        <label><input type="radio" name="pageSize" value="letter"> Letter</label>
+        <label><input type="radio" name="pageSize" value="original"> 元の画像サイズ</label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">フィットモード</label>
+      <div class="radio-group">
+        <label><input type="radio" name="fitMode" value="fit" checked> ページに合わせる（余白あり）</label>
+        <label><input type="radio" name="fitMode" value="fill"> ページを埋める</label>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="action-btn action-btn-primary" id="convertBtn">PDFに変換する</button>
+      <button class="action-btn action-btn-secondary" id="resetBtn">リセット</button>
+    </div>
+  </div>
+
+  <div class="prog-wrap" id="progWrap">
+    <div class="prog-bar" id="progBar"></div>
+  </div>
+  <div class="status" id="status"></div>
+
+  <div class="result-box" id="resultBox">
+    <div class="ri">✅</div>
+    <h3>変換完了！</h3>
+    <p>PDFファイルの準備ができました。ダウンロードしてください。</p>
+    <button class="dl-btn" id="dlBtn">PDFをダウンロード</button>
+  </div>
+</section>
+
+<section class="how-section">
+  <h2>使い方</h2>
+  <div class="how-steps">
+    <div class="how-step">
+      <div class="sn">1</div>
+      <h3>画像をアップロード</h3>
+      <p>JPG・PNG画像をドラッグ＆ドロップするか、クリックして選択します</p>
+    </div>
+    <div class="how-step">
+      <div class="sn">2</div>
+      <h3>設定を選択</h3>
+      <p>ページサイズとレイアウトを選択し、画像の順番を調整します</p>
+    </div>
+    <div class="how-step">
+      <div class="sn">3</div>
+      <h3>ダウンロード</h3>
+      <p>画像が含まれたPDFをダウンロードします</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  &copy; 2024 weLovePDF &nbsp;|&nbsp; <a href="index.html">ホームに戻る</a>
+</footer>
+
+<script>
+const { PDFDocument } = PDFLib;
+let fileList = [];
+
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const optionsPanel = document.getElementById('optionsPanel');
+const convertBtn = document.getElementById('convertBtn');
+const resetBtn = document.getElementById('resetBtn');
+const addMoreBtn = document.getElementById('addMoreBtn');
+const progWrap = document.getElementById('progWrap');
+const progBar = document.getElementById('progBar');
+const statusEl = document.getElementById('status');
+const resultBox = document.getElementById('resultBox');
+const dlBtn = document.getElementById('dlBtn');
+
+// Drop zone events
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  addFiles(e.dataTransfer.files);
+});
+dropZone.addEventListener('click', () => fileInput.click());
+document.getElementById('selectBtn').addEventListener('click', e => { e.stopPropagation(); fileInput.click(); });
+fileInput.addEventListener('change', () => { addFiles(fileInput.files); fileInput.value = ''; });
+addMoreBtn.addEventListener('click', () => fileInput.click());
+
+convertBtn.addEventListener('click', processConvert);
+resetBtn.addEventListener('click', () => {
+  fileList = [];
+  optionsPanel.style.display = 'none';
+  progWrap.style.display = 'none';
+  progBar.style.width = '0%';
+  statusEl.textContent = '';
+  statusEl.className = 'status';
+  resultBox.style.display = 'none';
+});
+
+async function fileToEmbeddable(file, pdfDoc) {
+  if (file.type === 'image/jpeg') {
+    const ab = await file.arrayBuffer();
+    return await pdfDoc.embedJpg(ab);
+  }
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = async () => {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        canvas.getContext('2d').drawImage(img, 0, 0);
+        canvas.toBlob(async blob => {
+          const ab = await blob.arrayBuffer();
+          const embedded = await pdfDoc.embedPng(ab);
+          URL.revokeObjectURL(url);
+          resolve(embedded);
+        }, 'image/png');
+      } catch(e) { reject(e); }
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
+}
+
+async function processConvert() {
+  if (fileList.length === 0) { showError('画像ファイルを選択してください'); return; }
+
+  const pageSize = document.querySelector('input[name="pageSize"]:checked').value;
+  const fitMode = document.querySelector('input[name="fitMode"]:checked').value;
+
+  showProgress();
+  setProgress(10);
+  setStatus('PDFを作成中...');
+
+  try {
+    const pdfDoc = await PDFDocument.create();
+
+    for (let i = 0; i < fileList.length; i++) {
+      setProgress(10 + (i / fileList.length) * 80);
+      setStatus((i + 1) + ' / ' + fileList.length + ' 枚目を処理中...');
+
+      const img = await fileToEmbeddable(fileList[i], pdfDoc);
+      const { width: iw, height: ih } = img;
+
+      let pageWidth, pageHeight;
+      if (pageSize === 'a4') { pageWidth = 595.28; pageHeight = 841.89; }
+      else if (pageSize === 'a4l') { pageWidth = 841.89; pageHeight = 595.28; }
+      else if (pageSize === 'letter') { pageWidth = 612; pageHeight = 792; }
+      else { pageWidth = iw; pageHeight = ih; }
+
+      const page = pdfDoc.addPage([pageWidth, pageHeight]);
+
+      let drawW, drawH, drawX, drawY;
+      if (pageSize === 'original') {
+        drawW = iw; drawH = ih; drawX = 0; drawY = 0;
+      } else if (fitMode === 'fit') {
+        const padding = 20;
+        const scale = Math.min((pageWidth - padding*2) / iw, (pageHeight - padding*2) / ih);
+        drawW = iw * scale; drawH = ih * scale;
+        drawX = (pageWidth - drawW) / 2; drawY = (pageHeight - drawH) / 2;
+      } else {
+        const scale = Math.max(pageWidth / iw, pageHeight / ih);
+        drawW = iw * scale; drawH = ih * scale;
+        drawX = (pageWidth - drawW) / 2; drawY = (pageHeight - drawH) / 2;
+      }
+
+      page.drawImage(img, { x: drawX, y: drawY, width: drawW, height: drawH });
+    }
+
+    setProgress(95);
+    setStatus('保存中...');
+    const bytes = await pdfDoc.save();
+    setProgress(100);
+    showResult(bytes, 'images_converted.pdf');
+  } catch(e) {
+    showError('エラー: ' + e.message);
+  }
+}
+
+function addFiles(files) {
+  for (const f of files) {
+    if (f.type.startsWith('image/')) fileList.push(f);
+  }
+  renderImageList();
+  optionsPanel.style.display = 'block';
+}
+
+function renderImageList() {
+  const list = document.getElementById('imgList');
+  list.innerHTML = '';
+  document.getElementById('imgCount').textContent = fileList.length + '枚の画像が選択されました';
+
+  fileList.forEach((file, idx) => {
+    const url = URL.createObjectURL(file);
+    const item = document.createElement('div');
+    item.className = 'img-item';
+    const sizeKb = (file.size / 1024).toFixed(1);
+    item.innerHTML = '<img class="img-thumb" src="' + url + '" alt="">' +
+      '<div style="flex:1;min-width:0"><div class="img-name">' + file.name + '</div>' +
+      '<div class="img-size-label">' + sizeKb + ' KB</div></div>' +
+      '<div class="img-actions">' +
+      (idx > 0 ? '<button onclick="moveImg(' + idx + ',-1)">↑</button>' : '') +
+      (idx < fileList.length-1 ? '<button onclick="moveImg(' + idx + ',1)">↓</button>' : '') +
+      '<button class="rm-btn" onclick="removeImg(' + idx + ')">✕</button></div>';
+    list.appendChild(item);
+  });
+}
+
+function moveImg(idx, dir) {
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= fileList.length) return;
+  [fileList[idx], fileList[newIdx]] = [fileList[newIdx], fileList[idx]];
+  renderImageList();
+}
+
+function removeImg(idx) {
+  fileList.splice(idx, 1);
+  renderImageList();
+  if (fileList.length === 0) optionsPanel.style.display = 'none';
+}
+
+function showProgress() {
+  progWrap.style.display = 'block';
+  resultBox.style.display = 'none';
+  statusEl.className = 'status';
+}
+
+function setProgress(val) {
+  progBar.style.width = val + '%';
+}
+
+function setStatus(msg) {
+  statusEl.textContent = msg;
+}
+
+function showError(msg) {
+  statusEl.textContent = msg;
+  statusEl.className = 'status err';
+  progWrap.style.display = 'none';
+}
+
+function showResult(bytes, filename) {
+  const blob = new Blob([bytes], { type: 'application/pdf' });
+  const url = URL.createObjectURL(blob);
+  dlBtn.onclick = () => {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+  };
+  resultBox.style.display = 'block';
+  statusEl.textContent = '変換が完了しました！';
+}
+</script>
+</body>
+</html>
