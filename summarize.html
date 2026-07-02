@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PDFをAI要約 - weLovePDF</title>
+<title>PDF要約 — weLovePDF</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--red:#e2413e;--red-dark:#c0302d;--gray-light:#f5f5f5;--gray:#888;--text:#333;--white:#fff}
@@ -16,45 +17,35 @@ nav{max-width:1200px;margin:0 auto;padding:0 24px;height:60px;display:flex;align
 .nav-links>li>a{display:flex;align-items:center;gap:4px;text-decoration:none;color:var(--text);font-size:.88rem;font-weight:500;padding:8px 12px;border-radius:6px;white-space:nowrap}
 .nav-links>li>a:hover{background:#f5f5f5;color:var(--red)}
 .nav-dropdown{position:relative}
-.dropdown-menu{display:none;position:absolute;top:calc(100% + 6px);left:0;background:var(--white);border:1px solid #eee;border-radius:12px;padding:20px 24px;box-shadow:0 8px 32px rgba(0,0,0,.12);z-index:400;gap:32px;min-width:480px}
+.dropdown-menu{display:none;position:absolute;top:calc(100%+6px);left:0;background:var(--white);border:1px solid #eee;border-radius:12px;padding:20px 24px;box-shadow:0 8px 32px rgba(0,0,0,.12);z-index:400;gap:32px;min-width:520px}
 .nav-dropdown:hover .dropdown-menu{display:flex}
-.dropdown-col{min-width:190px}
+.dropdown-col{min-width:200px}
 .dropdown-col h5{font-size:.75rem;color:#aaa;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;font-weight:700}
 .dropdown-col a{display:block;color:var(--text);text-decoration:none;font-size:.86rem;padding:5px 6px;border-radius:6px}
 .dropdown-col a:hover{background:#fff5f5;color:var(--red)}
-.nav-right{display:flex;gap:12px;margin-left:auto}
-
-
-.tool-hero{background:linear-gradient(135deg,#fff 0%,#fff5f5 100%);text-align:center;padding:56px 24px 40px}
-.tool-hero .big-icon{font-size:3.5rem;margin-bottom:20px}
-.tool-hero h1{font-size:2rem;font-weight:800;margin-bottom:12px}
-.tool-hero p{color:#555;font-size:1rem;max-width:560px;margin:0 auto;line-height:1.7}
-.cs-section{max-width:600px;margin:64px auto;padding:0 24px 80px;text-align:center}
-.cs-badge{display:inline-block;background:linear-gradient(135deg,var(--red),#ff6b35);color:white;font-size:.8rem;font-weight:700;padding:6px 18px;border-radius:20px;letter-spacing:1px;text-transform:uppercase;margin-bottom:28px}
-.cs-section h2{font-size:1.6rem;font-weight:800;margin-bottom:16px}
-.cs-section>p{color:#555;font-size:1rem;line-height:1.7;margin-bottom:32px}
-.features-preview{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:40px;text-align:left}
-.feature-item{background:var(--gray-light);border-radius:12px;padding:20px}
-.feature-item .fi-icon{font-size:1.5rem;margin-bottom:8px}
-.feature-item h4{font-size:.9rem;font-weight:700;margin-bottom:4px}
-.feature-item p{font-size:.82rem;color:var(--gray);margin:0}
-.notify-form{display:flex;gap:12px;max-width:400px;margin:0 auto 16px}
-.notify-form input{flex:1;padding:12px 16px;border:1.5px solid #ddd;border-radius:8px;font-size:.9rem;outline:none}
-.notify-form input:focus{border-color:var(--red)}
-.notify-form button{padding:12px 24px;background:var(--red);color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer;white-space:nowrap}
-.notify-form button:hover{background:var(--red-dark)}
-.notify-note{font-size:.82rem;color:var(--gray)}
-.cs-back{display:inline-block;margin-top:32px;color:var(--red);text-decoration:none;font-weight:600;font-size:.9rem}
-.cs-back:hover{text-decoration:underline}
-.how-section{background:var(--gray-light);padding:56px 24px;text-align:center}
-.how-section h2{font-size:1.5rem;font-weight:800;margin-bottom:40px}
-.how-steps{max-width:800px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
-.how-step{display:flex;flex-direction:column;align-items:center;gap:12px}
-.sn{width:40px;height:40px;background:var(--red);color:var(--white);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem}
-.how-step h3{font-size:.95rem;font-weight:700}
-.how-step p{font-size:.85rem;color:var(--gray)}
-footer{background:#2d2d2d;color:#ccc;text-align:center;padding:24px;font-size:.85rem}
-footer a{color:var(--red);text-decoration:none;font-weight:700}
+.hero{background:linear-gradient(135deg,#fff 0%,#fff5f5 100%);text-align:center;padding:56px 24px 40px}
+.hero-icon{font-size:3.5rem;margin-bottom:16px}
+.hero h1{font-size:2rem;font-weight:800;margin-bottom:12px}
+.hero p{color:#555;font-size:1rem;max-width:560px;margin:0 auto;line-height:1.7}
+.main{max-width:860px;margin:40px auto;padding:0 24px}
+.drop-zone{border:2.5px dashed #ddd;border-radius:16px;padding:48px 24px;text-align:center;cursor:pointer;transition:all .2s;background:var(--gray-light);margin-bottom:24px}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--red);background:#fff5f5}
+.dz-icon{font-size:2.8rem;margin-bottom:12px}
+.drop-zone h3{font-size:1.05rem;font-weight:700;margin-bottom:8px}
+.drop-zone p{color:var(--gray);font-size:.88rem;margin-bottom:16px}
+.btn{display:inline-block;padding:11px 28px;background:var(--red);color:#fff;border-radius:8px;font-size:.95rem;font-weight:700;cursor:pointer;border:none;text-decoration:none}
+.btn:hover{background:var(--red-dark)}
+.btn-outline{background:transparent;border:2px solid var(--red);color:var(--red)}
+.btn-outline:hover{background:#fff5f5}
+.options{display:flex;gap:16px;align-items:center;margin-bottom:24px;flex-wrap:wrap}
+.options label{font-size:.9rem;font-weight:600}
+select{padding:8px 14px;border:1.5px solid #ddd;border-radius:8px;font-size:.9rem;background:#fff}
+.result-box{border:1.5px solid #eee;border-radius:12px;padding:24px;background:#fafafa;font-size:.95rem;line-height:1.8;max-height:500px;overflow-y:auto}
+.actions{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap}
+.stat-bar{background:#f0f0f0;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:.88rem;color:#555}
+input[type=file]{display:none}
+input[type=range]{width:200px}
+footer{background:#2d2d2d;color:#ccc;padding:28px 24px;text-align:center;font-size:.82rem;margin-top:80px}
 </style>
 </head>
 <body>
@@ -70,19 +61,19 @@ footer a{color:var(--red);text-decoration:none;font-weight:700}
         <div class="dropdown-menu">
           <div class="dropdown-col">
             <h5>PDFに変換</h5>
-            <a href="jpg-to-pdf.html">🖼️ JPEG PDF 変換</a>
-            <a href="word-to-pdf.html">📝 WORD PDF 変換</a>
-            <a href="ppt-to-pdf.html">📊 POWERPOINT PDF 変換</a>
-            <a href="excel-to-pdf.html">📈 EXCEL PDF 変換</a>
-            <a href="html-to-pdf.html">🌐 HTMLからPDF</a>
+            <a href="jpg-to-pdf.html">JPEG to PDF</a>
+            <a href="word-to-pdf.html">WORD to PDF</a>
+            <a href="ppt-to-pdf.html">PPT to PDF</a>
+            <a href="excel-to-pdf.html">EXCEL to PDF</a>
+            <a href="html-to-pdf.html">HTML to PDF</a>
           </div>
           <div class="dropdown-col">
             <h5>PDFから変換</h5>
-            <a href="pdf-to-jpg.html">📸 PDF JPEG 変換</a>
-            <a href="pdf-to-word.html">📝 PDF WORD 変換</a>
-            <a href="pdf-to-ppt.html">📊 PDF POWERPOINT 変換</a>
-            <a href="pdf-to-excel.html">📈 PDF EXCEL 変換</a>
-            <a href="pdf-to-pdfa.html">📄 PDFからPDF/A</a>
+            <a href="pdf-to-jpg.html">PDF to JPEG</a>
+            <a href="pdf-to-word.html">PDF to WORD</a>
+            <a href="pdf-to-ppt.html">PDF to PPT</a>
+            <a href="pdf-to-excel.html">PDF to EXCEL</a>
+            <a href="pdf-to-pdfa.html">PDF to PDF/A</a>
           </div>
         </div>
       </li>
@@ -90,53 +81,94 @@ footer a{color:var(--red);text-decoration:none;font-weight:700}
     </ul>
   </nav>
 </header>
-
-<section class="tool-hero">
-  <div class="big-icon">🤖</div>
-  <h1>PDFをAI要約</h1>
-  <p>AIを使ってPDFの内容を自動要約します。長い文書の要点を素早く把握できます。</p>
-</section>
-
-<div class="cs-section">
-  <div class="cs-badge">🚀 近日公開</div>
-  <h2>この機能は近日公開予定です</h2>
-  <p>現在開発中です。公開までしばらくお待ちください。メールアドレスを登録すると、公開時にお知らせします。</p>
-  <div class="features-preview">
-    <div class="feature-item"><div class="fi-icon">🧠</div><h4>AI要約</h4><p>高度なAIモデルによる正確な要約</p></div>
-    <div class="feature-item"><div class="fi-icon">📝</div><h4>箇条書き形式</h4><p>重要ポイントを分かりやすく整理</p></div>
-    <div class="feature-item"><div class="fi-icon">🌐</div><h4>多言語対応</h4><p>日本語文書の要約に対応</p></div>
-    <div class="feature-item"><div class="fi-icon">💡</div><h4>カスタム長さ</h4><p>要約の詳細度を調整可能</p></div>
-  </div>
-  <form class="notify-form" onsubmit="subscribe(event)">
-    <input type="email" placeholder="メールアドレスを入力" required>
-    <button type="submit">通知を受け取る</button>
-  </form>
-  <p class="notify-note">公開時にお知らせします。迷惑メールは送信しません。</p>
-  <a href="index.html" class="cs-back">← すべてのPDFツールに戻る</a>
+<div class="hero">
+  <div class="hero-icon">📝</div>
+  <h1>PDFを要約</h1>
+  <p>PDFのテキストを自動抽出し、重要な部分を要約します。ブラウザ内で完結します。</p>
 </div>
-
-<section class="how-section">
-  <h2>使い方（公開後）</h2>
-  <div class="how-steps">
-    <div class="how-step"><div class="sn">1</div><h3>PDFをアップロード</h3><p>要約したいPDFをドラッグ＆ドロップ</p></div>
-    <div class="how-step"><div class="sn">2</div><h3>要約スタイルを選択</h3><p>短い要約・詳細要約・箇条書きから選択</p></div>
-    <div class="how-step"><div class="sn">3</div><h3>要約を取得</h3><p>AIが生成した要約をダウンロードまたはコピー</p></div>
+<div class="main">
+  <div class="drop-zone" id="dropZone">
+    <div class="dz-icon">📄</div>
+    <h3>PDFファイルをここにドロップ</h3>
+    <p>またはクリックしてファイルを選択</p>
+    <button class="btn" onclick="document.getElementById('fileInput').click()">ファイルを選択</button>
+    <input type="file" id="fileInput" accept=".pdf">
   </div>
-</section>
-
-<footer>
-  <p>© 2024 weLovePDF. すべてのPDFツールを無料で使用できます。 | <a href="index.html">ホームへ戻る</a></p>
-</footer>
-
+  <div class="options">
+    <label>要約の長さ：</label>
+    <select id="lengthSel">
+      <option value="3">短い（3文）</option>
+      <option value="7" selected>中程度（7文）</option>
+      <option value="15">長い（15文）</option>
+    </select>
+  </div>
+  <div id="resultArea" style="display:none">
+    <div class="stat-bar" id="statBar"></div>
+    <div class="result-box" id="resultBox"></div>
+    <div class="actions">
+      <button class="btn" onclick="downloadSummary()">要約をダウンロード</button>
+      <button class="btn btn-outline" onclick="copyText()">コピー</button>
+    </div>
+  </div>
+</div>
+<footer>copyright 2024 weLovePDF</footer>
 <script>
-function subscribe(e){
-  e.preventDefault();
-  const btn=e.target.querySelector('button');
-  btn.textContent='✓ 登録完了！';
-  btn.style.background='#28a745';
-  e.target.querySelector('input').disabled=true;
-  btn.disabled=true;
+pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+let summaryText='';
+const dropZone=document.getElementById('dropZone');
+const fileInput=document.getElementById('fileInput');
+dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('drag-over')});
+dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('drag-over');handleFile(e.dataTransfer.files[0])});
+fileInput.addEventListener('change',e=>handleFile(e.target.files[0]));
+dropZone.addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')fileInput.click()});
+
+async function handleFile(file){
+  if(!file||file.type!=='application/pdf'){alert('PDFファイルを選択してください');return}
+  const ab=await file.arrayBuffer();
+  const pdf=await pdfjsLib.getDocument({data:ab}).promise;
+  let fullText='';
+  for(let i=1;i<=pdf.numPages;i++){
+    const page=await pdf.getPage(i);
+    const content=await page.getTextContent();
+    fullText+=content.items.map(x=>x.str).join(' ')+' ';
+  }
+  if(!fullText.trim()){alert('テキストを抽出できませんでした。スキャンPDFはOCRページをご利用ください。');return}
+  const n=parseInt(document.getElementById('lengthSel').value);
+  summaryText=summarize(fullText,n);
+  document.getElementById('resultBox').textContent=summaryText;
+  document.getElementById('statBar').textContent=`元テキスト: 約${fullText.length}文字 → 要約: 約${summaryText.length}文字（${Math.round(summaryText.length/fullText.length*100)}%）`;
+  document.getElementById('resultArea').style.display='block';
 }
+
+function tokenize(text){return text.toLowerCase().replace(/[^\w぀-鿿]/g,' ').split(/\s+/).filter(w=>w.length>1)}
+function summarize(text,n){
+  // 文分割（句点・ピリオド・改行で区切る）
+  const sentences=text.split(/(?<=[。！？\.\!\?])|[\n\r]+/).map(s=>s.trim()).filter(s=>s.length>10);
+  if(sentences.length<=n)return sentences.join('\n');
+  // TF-IDF
+  const tokenized=sentences.map(s=>tokenize(s));
+  const tf=tokenized.map(tokens=>{
+    const freq={};tokens.forEach(t=>{freq[t]=(freq[t]||0)+1});
+    const max=Math.max(...Object.values(freq));
+    Object.keys(freq).forEach(k=>freq[k]/=max);
+    return freq;
+  });
+  const df={};
+  tokenized.forEach(tokens=>{[...new Set(tokens)].forEach(t=>{df[t]=(df[t]||0)+1})});
+  const N=sentences.length;
+  const scores=tokenized.map((tokens,i)=>{
+    const score=tokens.reduce((s,t)=>{
+      const tfidf=(tf[i][t]||0)*Math.log(N/(df[t]||1));
+      return s+tfidf;
+    },0);
+    return{i,score:tokens.length?score/tokens.length:0};
+  });
+  const top=scores.sort((a,b)=>b.score-a.score).slice(0,n).sort((a,b)=>a.i-b.i);
+  return top.map(x=>sentences[x.i]).join('\n\n');
+}
+function downloadSummary(){const b=new Blob([summaryText],{type:'text/plain;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='summary.txt';a.click()}
+function copyText(){navigator.clipboard.writeText(summaryText).then(()=>alert('コピーしました！'))}
 </script>
 </body>
 </html>

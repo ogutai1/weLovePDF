@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PDFを比較 - weLovePDF</title>
+<title>PDFを比較 — weLovePDF</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--red:#e2413e;--red-dark:#c0302d;--gray-light:#f5f5f5;--gray:#888;--text:#333;--white:#fff}
@@ -16,45 +17,34 @@ nav{max-width:1200px;margin:0 auto;padding:0 24px;height:60px;display:flex;align
 .nav-links>li>a{display:flex;align-items:center;gap:4px;text-decoration:none;color:var(--text);font-size:.88rem;font-weight:500;padding:8px 12px;border-radius:6px;white-space:nowrap}
 .nav-links>li>a:hover{background:#f5f5f5;color:var(--red)}
 .nav-dropdown{position:relative}
-.dropdown-menu{display:none;position:absolute;top:calc(100% + 6px);left:0;background:var(--white);border:1px solid #eee;border-radius:12px;padding:20px 24px;box-shadow:0 8px 32px rgba(0,0,0,.12);z-index:400;gap:32px;min-width:480px}
+.dropdown-menu{display:none;position:absolute;top:calc(100%+6px);left:0;background:var(--white);border:1px solid #eee;border-radius:12px;padding:20px 24px;box-shadow:0 8px 32px rgba(0,0,0,.12);z-index:400;gap:32px;min-width:520px}
 .nav-dropdown:hover .dropdown-menu{display:flex}
-.dropdown-col{min-width:190px}
+.dropdown-col{min-width:200px}
 .dropdown-col h5{font-size:.75rem;color:#aaa;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;font-weight:700}
 .dropdown-col a{display:block;color:var(--text);text-decoration:none;font-size:.86rem;padding:5px 6px;border-radius:6px}
 .dropdown-col a:hover{background:#fff5f5;color:var(--red)}
-.nav-right{display:flex;gap:12px;margin-left:auto}
-
-
-.tool-hero{background:linear-gradient(135deg,#fff 0%,#fff5f5 100%);text-align:center;padding:56px 24px 40px}
-.tool-hero .big-icon{font-size:3.5rem;margin-bottom:20px}
-.tool-hero h1{font-size:2rem;font-weight:800;margin-bottom:12px}
-.tool-hero p{color:#555;font-size:1rem;max-width:560px;margin:0 auto;line-height:1.7}
-.cs-section{max-width:600px;margin:64px auto;padding:0 24px 80px;text-align:center}
-.cs-badge{display:inline-block;background:linear-gradient(135deg,var(--red),#ff6b35);color:white;font-size:.8rem;font-weight:700;padding:6px 18px;border-radius:20px;letter-spacing:1px;text-transform:uppercase;margin-bottom:28px}
-.cs-section h2{font-size:1.6rem;font-weight:800;margin-bottom:16px}
-.cs-section>p{color:#555;font-size:1rem;line-height:1.7;margin-bottom:32px}
-.features-preview{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:40px;text-align:left}
-.feature-item{background:var(--gray-light);border-radius:12px;padding:20px}
-.feature-item .fi-icon{font-size:1.5rem;margin-bottom:8px}
-.feature-item h4{font-size:.9rem;font-weight:700;margin-bottom:4px}
-.feature-item p{font-size:.82rem;color:var(--gray);margin:0}
-.notify-form{display:flex;gap:12px;max-width:400px;margin:0 auto 16px}
-.notify-form input{flex:1;padding:12px 16px;border:1.5px solid #ddd;border-radius:8px;font-size:.9rem;outline:none}
-.notify-form input:focus{border-color:var(--red)}
-.notify-form button{padding:12px 24px;background:var(--red);color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer;white-space:nowrap}
-.notify-form button:hover{background:var(--red-dark)}
-.notify-note{font-size:.82rem;color:var(--gray)}
-.cs-back{display:inline-block;margin-top:32px;color:var(--red);text-decoration:none;font-weight:600;font-size:.9rem}
-.cs-back:hover{text-decoration:underline}
-.how-section{background:var(--gray-light);padding:56px 24px;text-align:center}
-.how-section h2{font-size:1.5rem;font-weight:800;margin-bottom:40px}
-.how-steps{max-width:800px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
-.how-step{display:flex;flex-direction:column;align-items:center;gap:12px}
-.sn{width:40px;height:40px;background:var(--red);color:var(--white);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem}
-.how-step h3{font-size:.95rem;font-weight:700}
-.how-step p{font-size:.85rem;color:var(--gray)}
-footer{background:#2d2d2d;color:#ccc;text-align:center;padding:24px;font-size:.85rem}
-footer a{color:var(--red);text-decoration:none;font-weight:700}
+.hero{background:linear-gradient(135deg,#fff 0%,#fff5f5 100%);text-align:center;padding:56px 24px 40px}
+.hero-icon{font-size:3.5rem;margin-bottom:16px}
+.hero h1{font-size:2rem;font-weight:800;margin-bottom:12px}
+.hero p{color:#555;font-size:1rem;max-width:560px;margin:0 auto;line-height:1.7}
+.main{max-width:1200px;margin:40px auto;padding:0 24px}
+.upload-row{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
+.drop-zone{border:2.5px dashed #ddd;border-radius:16px;padding:32px 16px;text-align:center;cursor:pointer;transition:all .2s;background:var(--gray-light)}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--red);background:#fff5f5}
+.drop-zone h3{font-size:.95rem;font-weight:700;margin-bottom:8px}
+.drop-zone p{color:var(--gray);font-size:.82rem;margin-bottom:12px}
+.btn{display:inline-block;padding:10px 22px;background:var(--red);color:#fff;border-radius:8px;font-size:.9rem;font-weight:700;cursor:pointer;border:none}
+.btn:hover{background:var(--red-dark)}
+.btn-outline{background:transparent;border:2px solid var(--red);color:var(--red)}
+.btn-outline:hover{background:#fff5f5}
+.compare-area{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:16px}
+.panel-title{font-size:.85rem;font-weight:700;color:var(--gray);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+canvas{max-width:100%;border:1px solid #eee;border-radius:8px;display:block}
+.nav-row{display:flex;gap:12px;align-items:center;justify-content:center;margin:16px 0}
+.page-info{font-size:.9rem;color:var(--gray)}
+.diff-info{background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:12px;font-size:.88rem;margin-top:12px;display:none}
+input[type=file]{display:none}
+footer{background:#2d2d2d;color:#ccc;padding:28px 24px;text-align:center;font-size:.82rem;margin-top:80px}
 </style>
 </head>
 <body>
@@ -70,19 +60,19 @@ footer a{color:var(--red);text-decoration:none;font-weight:700}
         <div class="dropdown-menu">
           <div class="dropdown-col">
             <h5>PDFに変換</h5>
-            <a href="jpg-to-pdf.html">🖼️ JPEG PDF 変換</a>
-            <a href="word-to-pdf.html">📝 WORD PDF 変換</a>
-            <a href="ppt-to-pdf.html">📊 POWERPOINT PDF 変換</a>
-            <a href="excel-to-pdf.html">📈 EXCEL PDF 変換</a>
-            <a href="html-to-pdf.html">🌐 HTMLからPDF</a>
+            <a href="jpg-to-pdf.html">JPEG to PDF</a>
+            <a href="word-to-pdf.html">WORD to PDF</a>
+            <a href="ppt-to-pdf.html">PPT to PDF</a>
+            <a href="excel-to-pdf.html">EXCEL to PDF</a>
+            <a href="html-to-pdf.html">HTML to PDF</a>
           </div>
           <div class="dropdown-col">
             <h5>PDFから変換</h5>
-            <a href="pdf-to-jpg.html">📸 PDF JPEG 変換</a>
-            <a href="pdf-to-word.html">📝 PDF WORD 変換</a>
-            <a href="pdf-to-ppt.html">📊 PDF POWERPOINT 変換</a>
-            <a href="pdf-to-excel.html">📈 PDF EXCEL 変換</a>
-            <a href="pdf-to-pdfa.html">📄 PDFからPDF/A</a>
+            <a href="pdf-to-jpg.html">PDF to JPEG</a>
+            <a href="pdf-to-word.html">PDF to WORD</a>
+            <a href="pdf-to-ppt.html">PDF to PPT</a>
+            <a href="pdf-to-excel.html">PDF to EXCEL</a>
+            <a href="pdf-to-pdfa.html">PDF to PDF/A</a>
           </div>
         </div>
       </li>
@@ -90,53 +80,126 @@ footer a{color:var(--red);text-decoration:none;font-weight:700}
     </ul>
   </nav>
 </header>
-
-<section class="tool-hero">
-  <div class="big-icon">🔍</div>
+<div class="hero">
+  <div class="hero-icon">🔍</div>
   <h1>PDFを比較</h1>
-  <p>2つのPDFを比較して差異を検出します。テキストや画像の変更点を視覚的にハイライトします。</p>
-</section>
-
-<div class="cs-section">
-  <div class="cs-badge">🚀 近日公開</div>
-  <h2>この機能は近日公開予定です</h2>
-  <p>現在開発中です。公開までしばらくお待ちください。メールアドレスを登録すると、公開時にお知らせします。</p>
-  <div class="features-preview">
-    <div class="feature-item"><div class="fi-icon">🔎</div><h4>差分ハイライト</h4><p>変更・追加・削除箇所を色分けで表示</p></div>
-    <div class="feature-item"><div class="fi-icon">📝</div><h4>テキスト比較</h4><p>文字レベルの詳細な差分を検出</p></div>
-    <div class="feature-item"><div class="fi-icon">📊</div><h4>比較レポート</h4><p>差異の一覧レポートを生成</p></div>
-    <div class="feature-item"><div class="fi-icon">👁️</div><h4>サイドバイサイド</h4><p>2つのPDFを並べて比較</p></div>
-  </div>
-  <form class="notify-form" onsubmit="subscribe(event)">
-    <input type="email" placeholder="メールアドレスを入力" required>
-    <button type="submit">通知を受け取る</button>
-  </form>
-  <p class="notify-note">公開時にお知らせします。迷惑メールは送信しません。</p>
-  <a href="index.html" class="cs-back">← すべてのPDFツールに戻る</a>
+  <p>2つのPDFを並べて比較し、テキストの差分を確認します。</p>
 </div>
-
-<section class="how-section">
-  <h2>使い方（公開後）</h2>
-  <div class="how-steps">
-    <div class="how-step"><div class="sn">1</div><h3>2つのPDFをアップロード</h3><p>比較したいPDFをそれぞれドロップ</p></div>
-    <div class="how-step"><div class="sn">2</div><h3>比較を実行</h3><p>AIが自動で差分を検出・分析</p></div>
-    <div class="how-step"><div class="sn">3</div><h3>結果を確認</h3><p>差分レポートをダウンロード</p></div>
+<div class="main">
+  <div class="upload-row">
+    <div class="drop-zone" id="dz1">
+      <h3>元のPDF</h3>
+      <p>ここにドロップまたは</p>
+      <button class="btn" onclick="document.getElementById('fi1').click()">ファイルを選択</button>
+      <input type="file" id="fi1" accept=".pdf">
+      <div id="fn1" style="margin-top:8px;font-size:.82rem;color:var(--red)"></div>
+    </div>
+    <div class="drop-zone" id="dz2">
+      <h3>比較するPDF</h3>
+      <p>ここにドロップまたは</p>
+      <button class="btn" onclick="document.getElementById('fi2').click()">ファイルを選択</button>
+      <input type="file" id="fi2" accept=".pdf">
+      <div id="fn2" style="margin-top:8px;font-size:.82rem;color:var(--red)"></div>
+    </div>
   </div>
-</section>
 
-<footer>
-  <p>© 2024 weLovePDF. すべてのPDFツールを無料で使用できます。 | <a href="index.html">ホームへ戻る</a></p>
-</footer>
-
+  <div id="compareSection" style="display:none">
+    <div class="nav-row">
+      <button class="btn btn-outline" onclick="changePage(-1)">◀ 前</button>
+      <span class="page-info" id="pageInfo">1 / 1</span>
+      <button class="btn btn-outline" onclick="changePage(1)">次 ▶</button>
+    </div>
+    <div class="compare-area">
+      <div>
+        <div class="panel-title" id="title1">PDF 1</div>
+        <canvas id="canvas1"></canvas>
+      </div>
+      <div>
+        <div class="panel-title" id="title2">PDF 2</div>
+        <canvas id="canvas2"></canvas>
+      </div>
+    </div>
+    <div class="diff-info" id="diffInfo"></div>
+  </div>
+</div>
+<footer>copyright 2024 weLovePDF</footer>
 <script>
-function subscribe(e){
-  e.preventDefault();
-  const btn=e.target.querySelector('button');
-  btn.textContent='✓ 登録完了！';
-  btn.style.background='#28a745';
-  e.target.querySelector('input').disabled=true;
-  btn.disabled=true;
+pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+let pdf1=null,pdf2=null,currentPage=1,maxPages=1;
+let texts1=[],texts2=[];
+let file1Name='',file2Name='';
+
+function setupDrop(dzId,fiId,fnId,num){
+  const dz=document.getElementById(dzId);
+  const fi=document.getElementById(fiId);
+  dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag-over')});
+  dz.addEventListener('dragleave',()=>dz.classList.remove('drag-over'));
+  dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag-over');loadPDF(e.dataTransfer.files[0],num,fnId)});
+  fi.addEventListener('change',e=>loadPDF(e.target.files[0],num,fnId));
+  dz.addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')fi.click()});
 }
+setupDrop('dz1','fi1','fn1',1);
+setupDrop('dz2','fi2','fn2',2);
+
+async function loadPDF(file,num,fnId){
+  if(!file||file.type!=='application/pdf'){alert('PDFを選択してください');return}
+  const name=file.name;
+  if(num===1)file1Name=name;else file2Name=name;
+  document.getElementById(fnId).textContent=name;
+  const ab=await file.arrayBuffer();
+  const pdf=await pdfjsLib.getDocument({data:ab}).promise;
+  if(num===1){pdf1=pdf;texts1=[]}else{pdf2=pdf;texts2=[]}
+  // テキスト抽出
+  for(let i=1;i<=pdf.numPages;i++){
+    const page=await pdf.getPage(i);
+    const content=await page.getTextContent();
+    const txt=content.items.map(x=>x.str).join(' ');
+    if(num===1)texts1.push(txt);else texts2.push(txt);
+  }
+  if(pdf1&&pdf2){
+    maxPages=Math.max(pdf1.numPages,pdf2.numPages);
+    currentPage=1;
+    document.getElementById('compareSection').style.display='block';
+    document.getElementById('title1').textContent=file1Name;
+    document.getElementById('title2').textContent=file2Name;
+    renderPage();
+  }
+}
+
+async function renderPage(){
+  document.getElementById('pageInfo').textContent=`${currentPage} / ${maxPages}`;
+  await renderOne(pdf1,canvas1,currentPage);
+  await renderOne(pdf2,canvas2,currentPage);
+  showDiff();
+}
+
+async function renderOne(pdf,canvas,pageNum){
+  if(!pdf||pageNum>pdf.numPages){canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);return}
+  const page=await pdf.getPage(pageNum);
+  const vp=page.getViewport({scale:1.2});
+  canvas.width=vp.width;canvas.height=vp.height;
+  await page.render({canvasContext:canvas.getContext('2d'),viewport:vp}).promise;
+}
+
+function showDiff(){
+  const t1=texts1[currentPage-1]||'';
+  const t2=texts2[currentPage-1]||'';
+  const div=document.getElementById('diffInfo');
+  if(t1===t2){div.style.display='none';return}
+  const words1=new Set(t1.split(/\s+/));
+  const words2=new Set(t2.split(/\s+/));
+  const added=[...words2].filter(w=>!words1.has(w)).slice(0,10);
+  const removed=[...words1].filter(w=>!words2.has(w)).slice(0,10);
+  div.style.display='block';
+  div.innerHTML=`<strong>差分検出:</strong><br>追加語句: ${added.join(', ')||'なし'}<br>削除語句: ${removed.join(', ')||'なし'}`;
+}
+
+function changePage(d){
+  currentPage=Math.max(1,Math.min(maxPages,currentPage+d));
+  renderPage();
+}
+const canvas1=document.getElementById('canvas1');
+const canvas2=document.getElementById('canvas2');
 </script>
 </body>
 </html>
