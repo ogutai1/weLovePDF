@@ -8,3 +8,5 @@ wrangler.jsonc
 .gitignore
 README.md
 vercel.json
+.env*
+.dev.vars*
